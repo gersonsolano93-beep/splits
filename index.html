@@ -626,7 +626,7 @@
     <!-- Firebase Imports Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+       // import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import {
             getAuth,
             signInAnonymously,
@@ -644,21 +644,30 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'boe-split-wow-default';
 
         // Custom config from user or default fallback
-        const firebaseConfig = typeof __firebase_config !== 'undefined'
-            ? JSON.parse(__firebase_config)
-            : {
-                apiKey: "AIzaSyB_GtvoiHmEnjoy-ElDSjm4PKSt9_1hf6s",
-                authDomain: "splits-6188d.firebaseapp.com",
-                projectId: "splits-6188d",
-                storageBucket: "splits-6188d.firebasestorage.app",
-                messagingSenderId: "926796958349",
-                appId: "1:926796958349:web:d67fb26e626895f0d630c4",
-                measurementId: "G-BVLQBG358C"
+        //const firebaseConfig = typeof __firebase_config !== 'undefined'
+        //    ? JSON.parse(__firebase_config)
+        //    : {
+        //        apiKey: "AIzaSyB_GtvoiHmEnjoy-ElDSjm4PKSt9_1hf6s",
+        //        authDomain: "splits-6188d.firebaseapp.com",
+        //        projectId: "splits-6188d",
+        //        storageBucket: "splits-6188d.firebasestorage.app",
+        //        messagingSenderId: "926796958349",
+        //        appId: "1:926796958349:web:d67fb26e626895f0d630c4",
+        //        measurementId: "G-BVLQBG358C"
+        //    };
+        const firebaseConfig = {
+                  apiKey: "AIzaSyB_GtvoiHmBnjoy-EiDSjn4PkSt9_1hf6s",
+                  authDomain: "splits-6188d.firebaseapp.com",
+                  projectId: "splits-6188d",
+                  storageBucket: "splits-6188d.firebasestorage.app",
+                  messagingSenderId: "926796958349",
+                  appId: "1:926796958349:web:d67fb26e626895f0d630c4",
+                  measurementId: "G-BVLQBG358C"
             };
 
         // 1. Initialize Firebase v11 App
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+        //const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
