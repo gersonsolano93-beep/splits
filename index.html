@@ -28,517 +28,599 @@
         }
     </script>
     <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0B0D12;
             color: #E2E8F0;
         }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: #161922;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #2A2F3D;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #A335EE;
         }
+
         .text-glow-gold {
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
+
         .text-glow-epic {
             text-shadow: 0 0 10px rgba(163, 53, 238, 0.4);
         }
     </style>
 </head>
 
-<body class="min-h-screen flex flex-col justify-between relative bg-wow-bg text-slate-200">
+<body class="min-h-screen flex flex-col justify-between">
 
-    <!-- ACCESS GATE / SCREEN LOCK FOR UNAPPROVED DEVICES -->
-    <div id="accessGateScreen" class="fixed inset-0 z-50 bg-[#0B0D12] flex items-center justify-center p-4">
-        <div class="max-w-lg w-full bg-wow-card border border-wow-border rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 text-center relative overflow-hidden">
-            <!-- Glow background effect -->
-            <div class="absolute -top-24 -left-24 w-48 h-48 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-purple-700 via-wow-accent to-amber-500 flex items-center justify-center shadow-lg shadow-purple-900/40">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-            </div>
-
-            <div>
-                <h2 class="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-300 to-amber-500">
-                    Acceso Restringido por Dispositivo
-                </h2>
-                <p class="text-xs text-slate-400 mt-2">
-                    Este sistema utiliza vinculación de token único por dispositivo. Tu dispositivo debe ser autorizado por el administrador para ver los datos de reparto.
-                </p>
-            </div>
-
-            <!-- Device Token Box -->
-            <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 text-left space-y-2">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-400">
-                    <span>Token Único de tu Dispositivo:</span>
-                    <span id="gateStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                        No Vinculado
-                    </span>
+    <!-- Navigation / Header -->
+    <header class="bg-wow-card/90 backdrop-blur border-b border-wow-border sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-700 via-wow-accent to-amber-500 flex items-center justify-center shadow-lg shadow-purple-900/30">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                        </path>
+                    </svg>
                 </div>
-                <div class="flex items-center gap-2">
-                    <input type="text" id="deviceTokenDisplay" readonly class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono font-bold text-purple-300 select-all focus:outline-none">
-                    <button onclick="copyDeviceToken()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1 shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                        Copiar
+                <div>
+                    <h1
+                        class="text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-300 to-amber-500">
+                        BoE Split Manager <span
+                            class="text-xs px-2 py-0.5 rounded-full bg-purple-900/50 text-purple-300 border border-purple-500/30">WoW
+                            Pro</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Sincronizado en la nube · Control de Raid & Reparto</p>
+                </div>
+            </div>
+
+            <!-- User Auth & Role Info -->
+            <div class="flex items-center space-x-3">
+                <!-- Sync Status Badge -->
+                <div id="syncStatus"
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Nube Conectada</span>
+                </div>
+
+                <!-- User Session / Login Area -->
+                <div id="userSessionArea" class="flex items-center gap-2">
+                    <button onclick="openLoginModal('roster')"
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-950/80 hover:bg-sky-900 text-sky-300 border border-sky-700/50 transition flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <span>Login Roster</span>
+                    </button>
+                    <button onclick="openLoginModal('admin')"
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-950/80 hover:bg-purple-900 text-purple-300 border border-purple-700/50 transition flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                            </path>
+                        </svg>
+                        <span>Login Admin</span>
+                    </button>
+                </div>
+
+                <!-- Active Role Indicator -->
+                <div id="roleBadge" class="hidden flex items-center gap-2">
+                    <span id="roleBadgeTag"
+                        class="px-3 py-1 rounded-lg text-xs font-bold border flex items-center gap-1.5">
+                        <!-- Filled by JS -->
+                    </span>
+                    <button onclick="logoutSession()" title="Cerrar Sesión"
+                        class="p-1.5 bg-slate-800 hover:bg-rose-900/50 text-slate-300 hover:text-rose-300 rounded-lg border border-slate-700 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                            </path>
+                        </svg>
                     </button>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <!-- Request Access Form / Status Notice -->
-            <div id="requestFormContainer" class="space-y-3 text-left">
-                <div class="border-t border-slate-800 pt-4">
-                    <h3 class="text-xs font-bold text-slate-300 mb-2">Solicitar Aprobación de Acceso:</h3>
-                    <div class="space-y-2">
-                        <input type="text" id="reqUserName" placeholder="Tu Nombre / Nickname WoW" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
-                        <input type="email" id="reqUserEmail" placeholder="Tu Correo Electrónico (para ser notificado)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
-                        <button onclick="submitAccessRequest()" class="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-900/30 transition flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                            Enviar Solicitud al Administrador
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
+
+        <!-- Top Metrics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Total Gold -->
+            <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs uppercase font-bold tracking-wider text-slate-400">Total Oro Reunido</p>
+                        <h3 id="statTotalGold" class="text-2xl font-black text-wow-gold mt-1 text-glow-gold">0 g</h3>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Equivalente estimado:</span>
+                    <span id="statTotalUSD" class="text-wow-usd font-bold">$0.00 USD</span>
+                </div>
+            </div>
+
+            <!-- Total Drops -->
+            <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs uppercase font-bold tracking-wider text-slate-400">Drops Registrados</p>
+                        <h3 id="statTotalDrops" class="text-2xl font-black text-purple-400 mt-1 text-glow-epic">0</h3>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Pendientes de venta:</span>
+                    <span id="statPendingDrops" class="text-amber-400 font-bold">0 ítems</span>
+                </div>
+            </div>
+
+            <!-- Active Players -->
+            <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs uppercase font-bold tracking-wider text-slate-400">Jugadores (Roster)</p>
+                        <h3 id="statTotalPlayers" class="text-2xl font-black text-sky-400 mt-1">0</h3>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-sky-500/10 text-sky-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Promedio x Jugador:</span>
+                    <span id="statAverageGold" class="text-wow-gold font-semibold">0 g</span>
+                </div>
+            </div>
+
+            <!-- Gold Rate Input (Tasa del Oro funcional en tiempo real) -->
+            <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs uppercase font-bold tracking-wider text-slate-400">Tasa del Oro ($/100k)</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-slate-400 text-lg font-bold">$</span>
+                            <input type="number" id="goldRateInput" value="3.7" step="0.1" min="0"
+                                oninput="updateGoldRate()" onchange="updateGoldRate()"
+                                class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-lg font-extrabold text-amber-400 focus:outline-none focus:border-amber-500 transition">
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                </div>
+                <p class="mt-2 text-[11px] text-slate-400">Cálculo en vivo para pagar a USD.</p>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Left Panel: Roster & Totals (4 cols) -->
+            <div class="lg:col-span-4 space-y-6">
+
+                <!-- Roster Section -->
+                <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
+                            </svg>
+                            Roster de Jugadores
+                        </h2>
+                        <span id="playerBadgeCount"
+                            class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold border border-slate-700">0</span>
+                    </div>
+
+                    <!-- Add Player Form -->
+                    <div class="flex gap-2">
+                        <input type="text" id="playerNameInput" placeholder="Nombre del jugador"
+                            onkeyup="if(event.key==='Enter') requestAddPlayer()"
+                            class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
+                        <button type="button" onclick="requestAddPlayer()"
+                            class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm rounded-lg transition shadow-md shadow-purple-900/30 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Añadir
+                        </button>
+                    </div>
+
+                    <!-- Player List -->
+                    <div class="max-h-60 overflow-y-auto pr-1">
+                        <ul id="playerListUI" class="space-y-1.5">
+                            <li class="text-xs text-slate-500 text-center py-4">No hay jugadores registrados en el
+                                roster.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Totals Breakdown Section -->
+                <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            Totales a Pagar por Jugador
+                        </h2>
+                        <button onclick="copyDiscordReport()"
+                            class="text-xs px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 hover:bg-indigo-600/50 border border-indigo-500/30 transition flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3">
+                                </path>
+                            </svg>
+                            Discord
+                        </button>
+                    </div>
+
+                    <div id="totalsContainerUI" class="space-y-2 max-h-80 overflow-y-auto pr-1 text-sm">
+                        <p class="text-xs text-slate-500 text-center py-4">Agrega drops e integra participantes para ver
+                            los cálculos.</p>
+                    </div>
+                </div>
+
+                <!-- Backup & Settings Utilities -->
+                <div class="bg-wow-card border border-wow-border rounded-xl p-4 text-xs text-slate-400 space-y-3">
+                    <div class="font-bold text-slate-300 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                            </path>
+                        </svg>
+                        Gestión & Copias de Seguridad
+                    </div>
+                    <div class="flex flex-col gap-2 pt-1">
+                        <button onclick="exportJSONBackup()"
+                            class="w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold transition flex items-center justify-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Descargar Copia JSON
+                        </button>
+                        <button id="adminPassConfigBtn" onclick="openAdminConfigModal()"
+                            class="w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded border border-slate-700 font-semibold transition flex items-center justify-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                            </svg>
+                            Cambiar Contraseñas
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div id="requestPendingNotice" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-xs text-amber-300 text-left space-y-2">
-                <div class="font-bold flex items-center gap-2 text-amber-400">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                    Solicitud Pendiente de Aprobación
-                </div>
-                <p class="text-[11px] text-slate-300 leading-relaxed">
-                    Tu solicitud ha sido enviada con éxito. El administrador revisará tu Token y habilitará tu acceso. Una vez aprobado, el contenido se desbloqueará automáticamente en esta pantalla.
-                </p>
-            </div>
+            <!-- Right Panel: Drop Form & Drops Table (8 cols) -->
+            <div class="lg:col-span-8 space-y-6">
 
-            <!-- Direct Admin Unlock Link -->
-            <div class="border-t border-slate-800/80 pt-4 flex justify-between items-center text-xs">
-                <span class="text-slate-500 text-[11px]">¿Eres el Administrador?</span>
-                <button onclick="toggleAdminModeModal()" class="text-purple-400 hover:text-purple-300 font-semibold underline underline-offset-2">
-                    Acceso Administrador (PIN)
-                </button>
+                <!-- Form Card -->
+                <div id="formCardUI"
+                    class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4 transition-all duration-300">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 id="formTitleUI" class="text-base font-bold text-purple-300 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-wow-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Registrar Nuevo BoE
+                        </h2>
+                        <span id="formModeTag"
+                            class="hidden text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">EDICIÓN
+                            ACTIVA</span>
+                    </div>
+
+                    <form id="boeForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                        <input type="hidden" id="editingId" value="">
+
+                        <!-- Name & Price Row -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div class="sm:col-span-7">
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Ítem / Pieza
+                                    BoE</label>
+                                <input type="text" id="boeName" placeholder="Ej: Casco de Placas Leyenda Mítica"
+                                    required
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
+                            </div>
+                            <div class="sm:col-span-5">
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Precio en Oro (0 si está
+                                    pendiente)</label>
+                                <div class="relative">
+                                    <input type="number" id="boePriceGold" placeholder="0" min="0" step="any"
+                                        class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-8 py-2 text-sm text-amber-300 font-bold placeholder-slate-600 focus:outline-none focus:border-purple-500 transition">
+                                    <span class="absolute right-3 top-2 text-xs font-bold text-amber-500">g</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats & Socket -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Propiedad
+                                    Terciaria</label>
+                                <select id="boeStat"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition">
+                                    <option value="">Sin Terciaria</option>
+                                    <option value="Robo de vida">Robo de vida (Leech)</option>
+                                    <option value="Eludir">Eludir (Avoidance)</option>
+                                    <option value="Velocidad">Velocidad (Speed)</option>
+                                    <option value="Indestructible">Indestructible</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Ranura de Gema
+                                    (Socket)</label>
+                                <select id="boeSocket"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition">
+                                    <option value="Sin Ranura">Sin Ranura</option>
+                                    <option value="Con Ranura">Con Ranura (+Socket)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Participants Selection Grid -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-semibold text-slate-300">Participantes en este Drop
+                                    (Split):</label>
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="selectAllParticipants(true)"
+                                        class="text-[11px] text-purple-400 hover:underline">Marcar Todos</button>
+                                    <span class="text-slate-600 text-[11px]">|</span>
+                                    <button type="button" onclick="selectAllParticipants(false)"
+                                        class="text-[11px] text-slate-400 hover:underline">Desmarcar Todos</button>
+                                </div>
+                            </div>
+                            <div id="playerCheckboxesUI"
+                                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 bg-slate-950/60 p-3 rounded-lg border border-slate-800 max-h-40 overflow-y-auto">
+                                <p class="col-span-full text-xs text-slate-500 text-center py-2">Agrega jugadores al
+                                    roster para habilitar la selección.</p>
+                            </div>
+                        </div>
+
+                        <!-- Form Buttons -->
+                        <div class="flex items-center justify-end gap-3 pt-2">
+                            <button type="button" id="btnCancelEdit" onclick="cancelEdit()"
+                                class="hidden px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold rounded-lg transition">
+                                Cancelar
+                            </button>
+                            <button type="submit" id="btnSubmitForm"
+                                class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm rounded-lg shadow-lg shadow-purple-900/40 transition flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span id="btnSubmitText">Añadir Drop</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Drops History Card -->
+                <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4">
+                    <div
+                        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-3">
+                        <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 002-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                </path>
+                            </svg>
+                            Historial de Drops
+                        </h2>
+
+                        <!-- Search and Filter Bar -->
+                        <div class="w-full sm:w-auto flex items-center gap-2">
+                            <div class="relative flex-grow sm:flex-grow-0">
+                                <input type="text" id="searchInput" oninput="render()"
+                                    placeholder="Buscar ítem o jugador..."
+                                    class="w-full sm:w-48 bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
+                                <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Container -->
+                    <div class="overflow-x-auto rounded-lg border border-slate-800">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead
+                                class="bg-slate-900/80 text-slate-400 uppercase font-bold text-[11px] border-b border-slate-800">
+                                <tr>
+                                    <th class="px-4 py-3">Ítem / Pieza</th>
+                                    <th class="px-4 py-3">Atributos</th>
+                                    <th class="px-4 py-3">Valor / Precio</th>
+                                    <th class="px-4 py-3">Participantes</th>
+                                    <th class="px-4 py-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dropsTableBodyUI" class="divide-y divide-slate-800/60 bg-slate-950/30">
+                                <tr>
+                                    <td colspan="5" class="px-4 py-8 text-center text-slate-500">
+                                        No hay ningún drop registrado aún.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
-    </div>
 
-    <!-- MAIN APP CONTENT (HIDDEN BY DEFAULT UNTIL DEVICE APPROVED OR ADMIN PIN ENTERED) -->
-    <div id="appContent" class="hidden min-h-screen flex flex-col justify-between">
+    </main>
 
-        <!-- Navigation / Header -->
-        <header class="bg-wow-card/90 backdrop-blur border-b border-wow-border sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-700 via-wow-accent to-amber-500 flex items-center justify-center shadow-lg shadow-purple-900/30">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    <!-- Footer -->
+    <footer class="bg-wow-card border-t border-wow-border py-4 mt-8">
+        <div
+            class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>Control de Reparto BoE - World of Warcraft</span>
+            <span class="text-slate-600">Sincronizado vía Firebase Cloud · Listo para Producción</span>
+        </div>
+    </footer>
+
+    <!-- MODAL: Custom Login Modal (Username & Password for Roster or Admin) -->
+    <div id="loginModal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="bg-wow-card border border-wow-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl animate-fade-in">
+
+            <!-- Login Modal Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div id="loginIconBg" class="p-2 bg-sky-500/10 rounded-lg text-sky-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1">
+                            </path>
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-300 to-amber-500">
-                            BoE Split Manager <span class="text-xs px-2 py-0.5 rounded-full bg-purple-900/50 text-purple-300 border border-purple-500/30">WoW Pro</span>
-                        </h1>
-                        <p class="text-xs text-slate-400">Sincronizado en la nube · Dispositivo Vinculado</p>
+                        <h3 id="loginModalTitle" class="font-extrabold text-slate-100 text-base">Inicio de Sesión</h3>
+                        <p id="loginModalSubtitle" class="text-xs text-slate-400">Acceso para Jugadores o
+                            Administradores</p>
                     </div>
                 </div>
-
-                <!-- User Auth & Admin Info -->
-                <div class="flex items-center space-x-3">
-                    <!-- Sync Status Badge -->
-                    <div id="syncStatus" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>Nube Conectada</span>
-                    </div>
-
-                    <!-- Device Status Badge -->
-                    <button onclick="showDeviceTokenModal()" title="Ver Token Único de Dispositivo" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 transition flex items-center gap-1.5 shadow-sm">
-                        <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                        <span id="headerDeviceTokenText" class="font-mono text-[11px]">DEV-XXXX</span>
-                    </button>
-
-                    <!-- Pending Requests Badge (Admin) -->
-                    <button id="adminRequestsBtn" onclick="openDeviceManagerModal()" class="hidden px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                        <span>Solicitudes</span>
-                        <span id="pendingReqBadgeCount" class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-600 text-white font-bold">0</span>
-                    </button>
-
-                    <!-- Admin Lock State -->
-                    <button onclick="toggleAdminModeModal()" id="adminStatusBtn" title="Clic para desbloquear modo Administrador" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition flex items-center gap-1.5">
-                        <svg id="adminLockIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                        <span id="adminStatusText">Modo Lectura</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
-
-            <!-- Top Metrics Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Total Gold -->
-                <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-xs uppercase font-bold tracking-wider text-slate-400">Total Oro Reunido</p>
-                            <h3 id="statTotalGold" class="text-2xl font-black text-wow-gold mt-1 text-glow-gold">0 g</h3>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                    </div>
-                    <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
-                        <span>Equivalente estimado:</span>
-                        <span id="statTotalUSD" class="text-wow-usd font-bold">$0.00 USD</span>
-                    </div>
-                </div>
-
-                <!-- Total Drops -->
-                <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-xs uppercase font-bold tracking-wider text-slate-400">Drops Registrados</p>
-                            <h3 id="statTotalDrops" class="text-2xl font-black text-purple-400 mt-1 text-glow-epic">0</h3>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        </div>
-                    </div>
-                    <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
-                        <span>Pendientes de venta:</span>
-                        <span id="statPendingDrops" class="text-amber-400 font-bold">0 ítems</span>
-                    </div>
-                </div>
-
-                <!-- Active Players -->
-                <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-xs uppercase font-bold tracking-wider text-slate-400">Jugadores (Roster)</p>
-                            <h3 id="statTotalPlayers" class="text-2xl font-black text-sky-400 mt-1">0</h3>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-sky-500/10 text-sky-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        </div>
-                    </div>
-                    <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
-                        <span>Promedio x Jugador:</span>
-                        <span id="statAverageGold" class="text-wow-gold font-semibold">0 g</span>
-                    </div>
-                </div>
-
-                <!-- Tasa de Cambio Config -->
-                <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-xs uppercase font-bold tracking-wider text-slate-400">Tasa del Oro ($/100k)</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-slate-400 text-lg font-bold">$</span>
-                                <input type="number" id="goldRateInput" value="3.7" step="0.1" min="0" onchange="updateGoldRate()" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-lg font-extrabold text-amber-400 focus:outline-none focus:border-amber-500 transition">
-                            </div>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        </div>
-                    </div>
-                    <p class="mt-2 text-[11px] text-slate-400">Cálculo en vivo para pagar a USD.</p>
-                </div>
+                <button onclick="closeLoginModal()"
+                    class="text-slate-500 hover:text-slate-300 text-xl font-bold p-1">&times;</button>
             </div>
 
-            <!-- Main Content Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-                <!-- Left Panel: Roster & Totals (4 cols) -->
-                <div class="lg:col-span-4 space-y-6">
-
-                    <!-- Roster Section -->
-                    <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                            <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                Roster de Jugadores
-                            </h2>
-                            <span id="playerBadgeCount" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold border border-slate-700">0</span>
-                        </div>
-
-                        <!-- Add Player Form -->
-                        <div class="flex gap-2">
-                            <input type="text" id="playerNameInput" placeholder="Nombre del jugador" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
-                            <button onclick="requestAddPlayer()" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm rounded-lg transition shadow-md shadow-purple-900/30 flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                Añadir
-                            </button>
-                        </div>
-
-                        <!-- Player List -->
-                        <div class="max-h-60 overflow-y-auto pr-1">
-                            <ul id="playerListUI" class="space-y-1.5">
-                                <li class="text-xs text-slate-500 text-center py-4">No hay jugadores registrados en el roster.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Totals Breakdown Section -->
-                    <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                            <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                Totales a Pagar por Jugador
-                            </h2>
-                            <button onclick="copyDiscordReport()" class="text-xs px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 hover:bg-indigo-600/50 border border-indigo-500/30 transition flex items-center gap-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                                Discord
-                            </button>
-                        </div>
-
-                        <div id="totalsContainerUI" class="space-y-2 max-h-80 overflow-y-auto pr-1 text-sm">
-                            <p class="text-xs text-slate-500 text-center py-4">Agrega drops e integra participantes para ver los cálculos.</p>
-                        </div>
-                    </div>
-
-                    <!-- Backup & Security Utilities -->
-                    <div class="bg-wow-card border border-wow-border rounded-xl p-4 text-xs text-slate-400 space-y-3">
-                        <div class="font-bold text-slate-300 flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                            Protección por Dispositivo Autorizado
-                        </div>
-                        <p class="text-[11px] leading-relaxed text-slate-400">Tus datos residen en la nube de Firebase. Solo los dispositivos autorizados por el administrador pueden acceder al panel.</p>
-                        <div class="flex gap-2 pt-1">
-                            <button onclick="exportJSONBackup()" class="w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 font-semibold transition flex items-center justify-center gap-1.5">
-                                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                Descargar Copia JSON
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Panel: Drop Form & Drops Table (8 cols) -->
-                <div class="lg:col-span-8 space-y-6">
-
-                    <!-- Form Card -->
-                    <div id="formCardUI" class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4 transition-all duration-300">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                            <h2 id="formTitleUI" class="text-base font-bold text-purple-300 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-wow-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Registrar Nuevo BoE
-                            </h2>
-                            <span id="formModeTag" class="hidden text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">EDICIÓN ACTIVA</span>
-                        </div>
-
-                        <form id="boeForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                            <input type="hidden" id="editingId" value="">
-
-                            <!-- Name & Price Row -->
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                                <div class="sm:col-span-7">
-                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Ítem / Pieza BoE</label>
-                                    <input type="text" id="boeName" placeholder="Ej: Casco de Placas Leyenda Mítica" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
-                                </div>
-                                <div class="sm:col-span-5">
-                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Precio en Oro (0 si está pendiente)</label>
-                                    <div class="relative">
-                                        <input type="number" id="boePriceGold" placeholder="0" min="0" step="any" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-8 py-2 text-sm text-amber-300 font-bold placeholder-slate-600 focus:outline-none focus:border-purple-500 transition">
-                                        <span class="absolute right-3 top-2 text-xs font-bold text-amber-500">g</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Stats & Socket -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Propiedad Terciaria</label>
-                                    <select id="boeStat" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition">
-                                        <option value="">Sin Terciaria</option>
-                                        <option value="Robo de vida">Robo de vida (Leech)</option>
-                                        <option value="Eludir">Eludir (Avoidance)</option>
-                                        <option value="Velocidad">Velocidad (Speed)</option>
-                                        <option value="Indestructible">Indestructible</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Ranura de Gema (Socket)</label>
-                                    <select id="boeSocket" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition">
-                                        <option value="Sin Ranura">Sin Ranura</option>
-                                        <option value="Con Ranura">Con Ranura (+Socket)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Participants Selection Grid -->
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <label class="block text-xs font-semibold text-slate-300">Participantes en este Drop (Split):</label>
-                                    <div class="flex gap-2">
-                                        <button type="button" onclick="selectAllParticipants(true)" class="text-[11px] text-purple-400 hover:underline">Marcar Todos</button>
-                                        <span class="text-slate-600 text-[11px]">|</span>
-                                        <button type="button" onclick="selectAllParticipants(false)" class="text-[11px] text-slate-400 hover:underline">Desmarcar Todos</button>
-                                    </div>
-                                </div>
-                                <div id="playerCheckboxesUI" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 bg-slate-950/60 p-3 rounded-lg border border-slate-800 max-h-40 overflow-y-auto">
-                                    <p class="col-span-full text-xs text-slate-500 text-center py-2">Agrega jugadores al roster para habilitar la selección.</p>
-                                </div>
-                            </div>
-
-                            <!-- Form Buttons -->
-                            <div class="flex items-center justify-end gap-3 pt-2">
-                                <button type="button" id="btnCancelEdit" onclick="cancelEdit()" class="hidden px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold rounded-lg transition">
-                                    Cancelar
-                                </button>
-                                <button type="submit" id="btnSubmitForm" class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm rounded-lg shadow-lg shadow-purple-900/40 transition flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    <span id="btnSubmitText">Añadir Drop</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Drops History Card -->
-                    <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-3">
-                            <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                                Historial de Drops
-                            </h2>
-
-                            <!-- Search and Filter Bar -->
-                            <div class="w-full sm:w-auto flex items-center gap-2">
-                                <div class="relative flex-grow sm:flex-grow-0">
-                                    <input type="text" id="searchInput" oninput="render()" placeholder="Buscar ítem o jugador..." class="w-full sm:w-48 bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
-                                    <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Table Container -->
-                        <div class="overflow-x-auto rounded-lg border border-slate-800">
-                            <table class="w-full text-left text-xs text-slate-300">
-                                <thead class="bg-slate-900/80 text-slate-400 uppercase font-bold text-[11px] border-b border-slate-800">
-                                    <tr>
-                                        <th class="px-4 py-3">Ítem / Pieza</th>
-                                        <th class="px-4 py-3">Atributos</th>
-                                        <th class="px-4 py-3">Valor / Precio</th>
-                                        <th class="px-4 py-3">Participantes</th>
-                                        <th class="px-4 py-3 text-right">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dropsTableBodyUI" class="divide-y divide-slate-800/60 bg-slate-950/30">
-                                    <tr>
-                                        <td colspan="5" class="px-4 py-8 text-center text-slate-500">
-                                            No hay ningún drop registrado aún.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-        </main>
-
-        <!-- Footer -->
-        <footer class="bg-wow-card border-t border-wow-border py-4 mt-8">
-            <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
-                <span>Control de Reparto BoE - World of Warcraft</span>
-                <span class="text-slate-600">Sincronizado vía Firebase Cloud · GitHub Ready</span>
-            </div>
-        </footer>
-
-    </div>
-
-    <!-- MODAL: Device Authorization Manager (Admin Only) -->
-    <div id="deviceManagerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-wow-card border border-wow-border rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2.5 text-indigo-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                    <h3 class="font-extrabold text-slate-100 text-base">Gestión de Dispositivos Autorizados</h3>
-                </div>
-                <button onclick="closeDeviceManagerModal()" class="text-slate-400 hover:text-slate-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <!-- Role Selector Tabs inside Modal -->
+            <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-lg border border-slate-800">
+                <button type="button" id="tabRosterBtn" onclick="switchLoginTab('roster')"
+                    class="py-2 text-xs font-bold rounded-md transition text-sky-400 bg-slate-800 shadow">
+                    ⚔️ Modo Jugador / Roster
+                </button>
+                <button type="button" id="tabAdminBtn" onclick="switchLoginTab('admin')"
+                    class="py-2 text-xs font-bold rounded-md transition text-slate-400 hover:text-slate-200">
+                    👑 Modo Administrador
                 </button>
             </div>
 
-            <!-- Pending Requests Section -->
-            <div class="space-y-2">
-                <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Solicitudes de Acceso Pendientes</h4>
-                <div id="adminPendingListUI" class="max-h-40 overflow-y-auto space-y-2 pr-1">
-                    <p class="text-xs text-slate-500 py-2 text-center">Cargando solicitudes...</p>
+            <div class="space-y-3 pt-1">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Usuario / Nombre</label>
+                    <input type="text" id="loginUsernameInput" placeholder="Ej: roster o admin"
+                        onkeyup="if(event.key==='Enter') processLogin()"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-purple-500 transition">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Contraseña</label>
+                    <input type="password" id="loginPasswordInput" placeholder="Ingresa tu contraseña"
+                        onkeyup="if(event.key==='Enter') processLogin()"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-purple-500 transition">
+                </div>
+                <p id="loginErrorMsg"
+                    class="hidden text-xs text-rose-400 font-semibold bg-rose-950/40 p-2 rounded border border-rose-900/50">
+                    Usuario o contraseña incorrectos.</p>
             </div>
 
-            <!-- Approved Devices List -->
-            <div class="space-y-2 pt-2 border-t border-slate-800">
-                <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Dispositivos Autorizados</h4>
-                <div id="adminApprovedListUI" class="max-h-48 overflow-y-auto space-y-2 pr-1">
-                    <p class="text-xs text-slate-500 py-2 text-center">No hay dispositivos en la lista de permitidos.</p>
-                </div>
-            </div>
-
-            <!-- Quick Add Device Token -->
-            <div class="pt-2 border-t border-slate-800 space-y-2">
-                <label class="block text-xs font-semibold text-slate-400">Añadir Token Manualmente:</label>
-                <div class="flex gap-2">
-                    <input type="text" id="manualTokenInput" placeholder="DEV-XXXX-XXXX" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-100 focus:outline-none focus:border-indigo-500">
-                    <button onclick="addManualDeviceToken()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg transition">
-                        Aprobar Token
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex justify-end pt-2">
-                <button type="button" onclick="closeDeviceManagerModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition">
-                    Cerrar Panel
+            <div class="flex justify-between items-center pt-2">
+                <button type="button" onclick="closeLoginModal()"
+                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition">
+                    Cancelar
+                </button>
+                <button type="button" onclick="processLogin()"
+                    class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-lg shadow-md transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1">
+                        </path>
+                    </svg>
+                    <span>Ingresar</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: Security Password / PIN Verification -->
-    <div id="passwordModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- MODAL: Custom Master & Roster Password Configuration -->
+    <div id="adminConfigModal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-wow-card border border-wow-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex items-center gap-3 text-amber-400">
-                <div class="p-2 bg-amber-500/10 rounded-lg">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <div class="flex items-center gap-3 text-purple-400 border-b border-slate-800 pb-3">
+                <div class="p-2 bg-purple-500/10 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                    </svg>
                 </div>
                 <div>
-                    <h3 id="modalTitle" class="font-extrabold text-slate-100 text-base">Acción Protegida</h3>
-                    <p class="text-xs text-slate-400">Se requiere clave de administrador.</p>
+                    <h3 class="font-extrabold text-slate-100 text-base">Configurar Contraseñas</h3>
+                    <p class="text-xs text-slate-400">Actualiza las claves de acceso de la aplicación</p>
                 </div>
             </div>
 
-            <p id="modalDescription" class="text-xs text-slate-300 leading-relaxed bg-slate-900/60 p-3 rounded-lg border border-slate-800">
-                Introduce la clave de administrador para continuar.
-            </p>
-
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">Contraseña de Administración</label>
-                <input type="password" id="modalPasswordInput" placeholder="Ingresa clave" onkeyup="if(event.key==='Enter') confirmProtectedAction()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition">
-                <p id="modalErrorMsg" class="hidden text-xs text-rose-400 mt-1 font-semibold">Contraseña incorrecta. Inténtalo de nuevo.</p>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-sky-400 mb-1">Contraseña para Jugadores
+                        (Roster)</label>
+                    <input type="password" id="newRosterPin" placeholder="Por defecto: roster123"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-purple-500 transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-purple-400 mb-1">Contraseña de Administrador</label>
+                    <input type="password" id="newAdminPin" placeholder="Por defecto: admin123"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-purple-500 transition">
+                </div>
             </div>
 
             <div class="flex justify-between items-center pt-2">
-                <button type="button" onclick="closePasswordModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition">
-                    Cancelar
+                <button type="button" onclick="closeAdminConfigModal()"
+                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition">
+                    Cerrar
                 </button>
-                <button type="button" onclick="confirmProtectedAction()" class="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg shadow-md transition">
-                    Confirmar Acción
+                <button type="button" onclick="saveMasterPins()"
+                    class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-lg transition">
+                    Guardar Cambios
                 </button>
             </div>
         </div>
@@ -550,23 +632,23 @@
     <!-- Firebase Imports Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
+        import {
+            getAuth,
+            signInAnonymously,
             signInWithCustomToken,
-            onAuthStateChanged 
+            onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc, 
-            onSnapshot 
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            onSnapshot
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global variables provided by canvas environment fallback
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'boe-split-wow-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
+        const firebaseConfig = typeof __firebase_config !== 'undefined'
+            ? JSON.parse(__firebase_config)
             : {
                 apiKey: "AIzaSyDummyKeyForFallbackPurposeOnly",
                 authDomain: "boe-split-wow.firebaseapp.com",
@@ -589,30 +671,14 @@
             players: [],
             drops: [],
             goldRate: 3.7,
-            adminPin: "1234", // Default PIN, configurable
-            allowedDevices: [], // Array of approved device tokens
-            accessRequests: [] // Array of { id, token, name, email, requestedAt, status }
+            adminPin: "masterboe2026",    // Default admin password
+            rosterPin: "elites2026"    // Default roster user password
         };
 
-        window.currentUser = null;
-        window.isAdminUnlocked = false;
-        window.pendingActionCallback = null;
+        // Active Session Role State: 'guest', 'roster', 'admin'
+        window.userSession = JSON.parse(localStorage.getItem('boe_session_user') || 'null') || { role: 'guest', username: 'Invitado' };
 
-        // Obtain or Create Unique Device Token
-        function getDeviceToken() {
-            let token = localStorage.getItem('boe_device_token');
-            if (!token) {
-                const randPart1 = Math.random().toString(36).substring(2, 6).toUpperCase();
-                const randPart2 = Math.random().toString(36).substring(2, 6).toUpperCase();
-                token = `DEV-${randPart1}-${randPart2}`;
-                localStorage.setItem('boe_device_token', token);
-            }
-            return token;
-        }
-
-        window.currentDeviceToken = getDeviceToken();
-
-        // Initialize Authentication Anonymously
+        // Initialize Authentication
         async function initAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -621,13 +687,12 @@
                     await signInAnonymously(auth);
                 }
             } catch (err) {
-                console.warn("Auth fallback mode:", err);
-                try { await signInAnonymously(auth); } catch(e){}
+                console.warn("Auth initialization fallback to anonymous mode:", err);
+                try { await signInAnonymously(auth); } catch (e) { }
             }
         }
 
         onAuthStateChanged(auth, (user) => {
-            window.currentUser = user;
             if (user) {
                 subscribeToFirestore();
             }
@@ -639,52 +704,36 @@
                 if (snapshot.exists()) {
                     const data = snapshot.data();
                     if (data) {
-                        window.appState.players = data.players || [];
-                        window.appState.drops = data.drops || [];
+                        window.appState.players = Array.isArray(data.players) ? data.players : [];
+                        window.appState.drops = Array.isArray(data.drops) ? data.drops : [];
                         window.appState.goldRate = typeof data.goldRate === 'number' ? data.goldRate : 3.7;
                         if (data.adminPin) window.appState.adminPin = data.adminPin;
-                        window.appState.allowedDevices = data.allowedDevices || [];
-                        window.appState.accessRequests = data.accessRequests || [];
-                        
-                        document.getElementById('goldRateInput').value = window.appState.goldRate;
-                        
-                        // Check URL Parameters for direct approval link (e.g. ?approveToken=DEV-XXXX)
-                        checkUrlApprovalParam();
+                        if (data.rosterPin) window.appState.rosterPin = data.rosterPin;
 
-                        // Evaluate Device Authorization Gate
-                        evaluateAccessGate();
+                        const rateEl = document.getElementById('goldRateInput');
+                        // Solo actualiza el valor del input si el usuario no tiene el foco en él
+                        if (rateEl && document.activeElement !== rateEl) {
+                            rateEl.value = window.appState.goldRate;
+                        }
 
                         render();
-                        renderAdminDeviceList();
                     }
                 } else {
                     // Initial seed if document doesn't exist
-                    // By default approve current device if it's the first initialization
-                    window.appState.allowedDevices.push(window.currentDeviceToken);
                     saveDataToCloud();
                 }
             }, (error) => {
                 console.error("Firestore sync error:", error);
-                document.getElementById('syncStatus').className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                document.getElementById('syncStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>Sin conexión</span>`;
+                const syncEl = document.getElementById('syncStatus');
+                if (syncEl) {
+                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>Sin conexión</span>`;
+                }
             });
         }
 
-        // Check if URL has ?approveToken=
-        function checkUrlApprovalParam() {
-            const params = new URLSearchParams(window.location.search);
-            const tokenToApprove = params.get('approveToken');
-            if (tokenToApprove && !window.appState.allowedDevices.includes(tokenToApprove)) {
-                requirePassword(`Se ha detectado una solicitud de aprobación para el token "${tokenToApprove}". Introduce la clave de admin para autorizarlo:`, () => {
-                    approveDeviceToken(tokenToApprove);
-                    // Clear param
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                });
-            }
-        }
-
         // Save State to Cloud
-        window.saveDataToCloud = async function() {
+        window.saveDataToCloud = async function () {
             if (!auth.currentUser) return;
             try {
                 await setDoc(docRef, {
@@ -692,8 +741,7 @@
                     drops: window.appState.drops,
                     goldRate: window.appState.goldRate,
                     adminPin: window.appState.adminPin,
-                    allowedDevices: window.appState.allowedDevices,
-                    accessRequests: window.appState.accessRequests,
+                    rosterPin: window.appState.rosterPin,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
             } catch (err) {
@@ -706,213 +754,21 @@
     </script>
 
     <script>
-        // --- Access Control & Device Token Logic ---
-        function evaluateAccessGate() {
-            const token = window.currentDeviceToken;
-            const displayInput = document.getElementById('deviceTokenDisplay');
-            if (displayInput) displayInput.value = token;
-
-            const headerTokenText = document.getElementById('headerDeviceTokenText');
-            if (headerTokenText) headerTokenText.innerText = token;
-
-            const isApproved = (window.appState.allowedDevices || []).includes(token) || window.isAdminUnlocked;
-
-            const gateScreen = document.getElementById('accessGateScreen');
-            const appContent = document.getElementById('appContent');
-            const gateStatusBadge = document.getElementById('gateStatusBadge');
-
-            // Find existing request
-            const myRequest = (window.appState.accessRequests || []).find(r => r.token === token);
-
-            if (isApproved) {
-                gateScreen.classList.add('hidden');
-                appContent.classList.remove('hidden');
-            } else {
-                gateScreen.classList.remove('hidden');
-                appContent.classList.add('hidden');
-
-                if (myRequest && myRequest.status === 'pending') {
-                    gateStatusBadge.className = "px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold animate-pulse";
-                    gateStatusBadge.innerText = "Pendiente de Aprobación";
-                    document.getElementById('requestFormContainer').classList.add('hidden');
-                    document.getElementById('requestPendingNotice').classList.remove('hidden');
-                } else {
-                    gateStatusBadge.className = "px-2 py-0.5 rounded-full text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                    gateStatusBadge.innerText = "No Vinculado";
-                    document.getElementById('requestFormContainer').classList.remove('hidden');
-                    document.getElementById('requestPendingNotice').classList.add('hidden');
-                }
-            }
-        }
-
-        function copyDeviceToken() {
-            const token = window.currentDeviceToken;
-            navigator.clipboard.writeText(token);
-            showToast("Token copiado al portapapeles", "success");
-        }
-
-        function submitAccessRequest() {
-            const name = document.getElementById('reqUserName').value.trim();
-            const email = document.getElementById('reqUserEmail').value.trim();
-            const token = window.currentDeviceToken;
-
-            if (!name) {
-                showToast("Por favor ingresa tu nombre", "error");
-                return;
-            }
-
-            const existingReqIndex = window.appState.accessRequests.findIndex(r => r.token === token);
-            const newReq = {
-                id: Date.now(),
-                token,
-                name,
-                email,
-                requestedAt: new Date().toLocaleString(),
-                status: 'pending'
-            };
-
-            if (existingReqIndex !== -1) {
-                window.appState.accessRequests[existingReqIndex] = newReq;
-            } else {
-                window.appState.accessRequests.push(newReq);
-            }
-
-            window.saveDataToCloud();
-            evaluateAccessGate();
-            showToast("Solicitud enviada al administrador", "success");
-
-            // Optional: Generate mailto link for admin notification
-            const subject = encodeURIComponent(`Solicitud de Acceso BoE Split - Dispositivo ${token}`);
-            const body = encodeURIComponent(`Hola Administrador,\n\nSolicito aprobación para vincular mi dispositivo en la plataforma de reparto BoE.\n\nNombre: ${name}\nCorreo: ${email}\nToken Dispositivo: ${token}\n\nPuedes autorizarme abriendo la app o mediante este enlace directo:\n${window.location.origin}${window.location.pathname}?approveToken=${token}`);
-            
-            // Trigger mailto if email is provided
-            window.location.href = `mailto:admin@example.com?subject=${subject}&body=${body}`;
-        }
-
-        // --- Admin Device Manager Modal Functions ---
-        function openDeviceManagerModal() {
-            requirePassword("Acceso al panel de administración de dispositivos autorizados.", () => {
-                renderAdminDeviceList();
-                document.getElementById('deviceManagerModal').classList.remove('hidden');
-            });
-        }
-
-        function closeDeviceManagerModal() {
-            document.getElementById('deviceManagerModal').classList.add('hidden');
-        }
-
-        function approveDeviceToken(token) {
-            if (!window.appState.allowedDevices.includes(token)) {
-                window.appState.allowedDevices.push(token);
-            }
-            
-            // Update request status
-            const req = window.appState.accessRequests.find(r => r.token === token);
-            if (req) req.status = 'approved';
-
-            window.saveDataToCloud();
-            showToast(`Dispositivo ${token} aprobado`, "success");
-            renderAdminDeviceList();
-        }
-
-        function revokeDeviceToken(token) {
-            window.appState.allowedDevices = window.appState.allowedDevices.filter(t => t !== token);
-            
-            // Update request status
-            const req = window.appState.accessRequests.find(r => r.token === token);
-            if (req) req.status = 'rejected';
-
-            window.saveDataToCloud();
-            showToast(`Acceso a ${token} revocado`, "info");
-            renderAdminDeviceList();
-        }
-
-        function addManualDeviceToken() {
-            const input = document.getElementById('manualTokenInput');
-            const token = input.value.trim().toUpperCase();
-            if (!token) return;
-
-            approveDeviceToken(token);
-            input.value = '';
-        }
-
-        function renderAdminDeviceList() {
-            const pendingListUI = document.getElementById('adminPendingListUI');
-            const approvedListUI = document.getElementById('adminApprovedListUI');
-            
-            const requests = window.appState.accessRequests || [];
-            const allowed = window.appState.allowedDevices || [];
-
-            const pending = requests.filter(r => r.status === 'pending' && !allowed.includes(r.token));
-
-            // Update badge count in header
-            const badgeCount = document.getElementById('pendingReqBadgeCount');
-            if (badgeCount) badgeCount.innerText = pending.length;
-
-            // Render Pending List
-            if (pendingListUI) {
-                pendingListUI.innerHTML = '';
-                if (pending.length === 0) {
-                    pendingListUI.innerHTML = `<p class="text-xs text-slate-500 py-3 text-center">No hay solicitudes pendientes.</p>`;
-                } else {
-                    pending.forEach(r => {
-                        pendingListUI.innerHTML += `
-                            <div class="flex items-center justify-between p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs">
-                                <div>
-                                    <div class="font-bold text-amber-300">${r.name} <span class="font-mono text-[10px] text-slate-400">(${r.token})</span></div>
-                                    <div class="text-[10px] text-slate-400">${r.email || 'Sin correo'} · ${r.requestedAt}</div>
-                                </div>
-                                <div class="flex gap-1">
-                                    <button onclick="approveDeviceToken('${r.token}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-[11px]">Aprobar</button>
-                                    <button onclick="revokeDeviceToken('${r.token}')" class="px-2.5 py-1 bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white font-semibold rounded text-[11px]">Rechazar</button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            }
-
-            // Render Approved Devices List
-            if (approvedListUI) {
-                approvedListUI.innerHTML = '';
-                if (allowed.length === 0) {
-                    approvedListUI.innerHTML = `<p class="text-xs text-slate-500 py-3 text-center">No hay dispositivos vinculados.</p>`;
-                } else {
-                    allowed.forEach(token => {
-                        const reqInfo = requests.find(r => r.token === token);
-                        const label = reqInfo ? `${reqInfo.name} (${token})` : token;
-                        const isMyDevice = token === window.currentDeviceToken;
-
-                        approvedListUI.innerHTML += `
-                            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full ${isMyDevice ? 'bg-emerald-400' : 'bg-indigo-400'}"></span>
-                                    <span class="font-mono text-slate-200 font-semibold">${label} ${isMyDevice ? '<span class="text-[10px] text-emerald-400 font-normal">(Este Dispositivo)</span>' : ''}</span>
-                                </div>
-                                <button onclick="revokeDeviceToken('${token}')" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Revocar Acceso">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </div>
-                        `;
-                    });
-                }
-            }
-        }
-
         // --- Helper Notifications ---
         function showToast(message, type = "info") {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
-            
-            const bgClass = type === "success" 
-                ? "bg-emerald-950/90 text-emerald-200 border-emerald-500/40" 
-                : type === "error" 
-                ? "bg-rose-950/90 text-rose-200 border-rose-500/40" 
-                : "bg-slate-900/90 text-slate-200 border-slate-700";
+
+            const bgClass = type === "success"
+                ? "bg-emerald-950/90 text-emerald-200 border-emerald-500/40"
+                : type === "error"
+                    ? "bg-rose-950/90 text-rose-200 border-rose-500/40"
+                    : "bg-slate-900/90 text-slate-200 border-slate-700";
 
             toast.className = `pointer-events-auto px-4 py-2.5 rounded-xl border shadow-xl text-xs font-medium backdrop-blur flex items-center gap-2 transition-all transform duration-300 translate-y-2 ${bgClass}`;
             toast.innerHTML = `<span>${message}</span>`;
-            
+
             container.appendChild(toast);
             setTimeout(() => toast.classList.remove('translate-y-2'), 10);
             setTimeout(() => {
@@ -921,130 +777,216 @@
             }, 3000);
         }
 
-        // --- Security & Password Protected Execution ---
-        function requirePassword(actionDescription, callback) {
-            if (window.isAdminUnlocked) {
-                callback();
-                return;
-            }
+        // Selected Login Tab inside Login Modal
+        let activeLoginTab = 'roster';
 
-            window.pendingActionCallback = callback;
-            document.getElementById('modalDescription').innerText = actionDescription;
-            document.getElementById('modalPasswordInput').value = '';
-            document.getElementById('modalErrorMsg').classList.add('hidden');
-            document.getElementById('passwordModal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('modalPasswordInput').focus(), 100);
-        }
-
-        function closePasswordModal() {
-            document.getElementById('passwordModal').classList.add('hidden');
-            window.pendingActionCallback = null;
-        }
-
-        function confirmProtectedAction() {
-            const inputPin = document.getElementById('modalPasswordInput').value.trim();
-            const correctPin = window.appState.adminPin || "1234";
-
-            if (inputPin === correctPin) {
-                window.isAdminUnlocked = true;
-                updateAdminUI();
-                evaluateAccessGate();
-                closePasswordModal();
-                if (window.pendingActionCallback) {
-                    window.pendingActionCallback();
-                    window.pendingActionCallback = null;
+        function openLoginModal(tab = 'roster') {
+            switchLoginTab(tab);
+            document.getElementById('loginUsernameInput').value = tab === 'admin' ? 'admin' : '';
+            document.getElementById('loginPasswordInput').value = '';
+            document.getElementById('loginErrorMsg').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+            setTimeout(() => {
+                if (tab === 'roster' && !document.getElementById('loginUsernameInput').value) {
+                    document.getElementById('loginUsernameInput').focus();
+                } else {
+                    document.getElementById('loginPasswordInput').focus();
                 }
+            }, 100);
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        function switchLoginTab(tab) {
+            activeLoginTab = tab;
+            const tabRosterBtn = document.getElementById('tabRosterBtn');
+            const tabAdminBtn = document.getElementById('tabAdminBtn');
+            const modalTitle = document.getElementById('loginModalTitle');
+            const modalSub = document.getElementById('loginModalSubtitle');
+            const iconBg = document.getElementById('loginIconBg');
+
+            if (tab === 'roster') {
+                tabRosterBtn.className = "py-2 text-xs font-bold rounded-md transition text-sky-400 bg-slate-800 shadow";
+                tabAdminBtn.className = "py-2 text-xs font-bold rounded-md transition text-slate-400 hover:text-slate-200";
+                modalTitle.innerText = "Acceso Roster / Jugador";
+                modalSub.innerText = "Ingresa con las credenciales de tu equipo";
+                iconBg.className = "p-2 bg-sky-500/10 rounded-lg text-sky-400";
             } else {
-                document.getElementById('modalErrorMsg').classList.remove('hidden');
+                tabAdminBtn.className = "py-2 text-xs font-bold rounded-md transition text-purple-400 bg-slate-800 shadow";
+                tabRosterBtn.className = "py-2 text-xs font-bold rounded-md transition text-slate-400 hover:text-slate-200";
+                modalTitle.innerText = "Acceso Administrador";
+                modalSub.innerText = "Control total y permisos de gestión";
+                iconBg.className = "p-2 bg-purple-500/10 rounded-lg text-purple-400";
             }
         }
 
-        function toggleAdminModeModal() {
-            if (window.isAdminUnlocked) {
-                window.isAdminUnlocked = false;
-                updateAdminUI();
-                evaluateAccessGate();
-                showToast("Modo administrador bloqueado", "info");
-            } else {
-                requirePassword("Introduce la contraseña para habilitar los permisos de administración.", () => {
-                    showToast("Modo Administrador activado", "success");
-                });
+        function processLogin() {
+            const username = document.getElementById('loginUsernameInput').value.trim();
+            const password = document.getElementById('loginPasswordInput').value.trim();
+
+            const correctAdminPass = window.appState.adminPin || "admin123";
+            const correctRosterPass = window.appState.rosterPin || "roster123";
+
+            if (activeLoginTab === 'admin') {
+                if ((username.toLowerCase() === 'admin' || username.length > 0) && password === correctAdminPass) {
+                    window.userSession = { role: 'admin', username: username || 'Administrador' };
+                    saveSessionAndNotify();
+                } else {
+                    showLoginError("Contraseña de administrador incorrecta.");
+                }
+            } else { // Roster tab
+                if (username.length > 0 && password === correctRosterPass) {
+                    window.userSession = { role: 'roster', username: username };
+                    saveSessionAndNotify();
+                } else {
+                    showLoginError("Usuario o contraseña de Roster incorrecta.");
+                }
             }
         }
 
-        function updateAdminUI() {
-            const btnText = document.getElementById('adminStatusText');
-            const icon = document.getElementById('adminLockIcon');
-            const btn = document.getElementById('adminStatusBtn');
-            const adminReqBtn = document.getElementById('adminRequestsBtn');
+        function showLoginError(msg) {
+            const errEl = document.getElementById('loginErrorMsg');
+            errEl.innerText = msg;
+            errEl.classList.remove('hidden');
+        }
 
-            if (window.isAdminUnlocked) {
-                btnText.innerText = "Admin Activo";
-                btn.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 transition flex items-center gap-1.5 shadow-sm";
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>`;
-                if (adminReqBtn) adminReqBtn.classList.remove('hidden');
+        function saveSessionAndNotify() {
+            localStorage.setItem('boe_session_user', JSON.stringify(window.userSession));
+            closeLoginModal();
+            updateSessionUI();
+            showToast(`¡Bienvenido/a, ${window.userSession.username}! (${window.userSession.role.toUpperCase()})`, "success");
+        }
+
+        function logoutSession() {
+            window.userSession = { role: 'guest', username: 'Invitado' };
+            localStorage.removeItem('boe_session_user');
+            updateSessionUI();
+            showToast("Sesión cerrada correctamente", "info");
+        }
+
+        function updateSessionUI() {
+            const sessionArea = document.getElementById('userSessionArea');
+            const roleBadge = document.getElementById('roleBadge');
+            const roleBadgeTag = document.getElementById('roleBadgeTag');
+
+            if (!window.userSession || window.userSession.role === 'guest') {
+                sessionArea.classList.remove('hidden');
+                roleBadge.classList.add('hidden');
             } else {
-                btnText.innerText = "Modo Lectura";
-                btn.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition flex items-center gap-1.5";
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>`;
-                if (adminReqBtn) adminReqBtn.classList.add('hidden');
+                sessionArea.classList.add('hidden');
+                roleBadge.classList.remove('hidden');
+
+                if (window.userSession.role === 'admin') {
+                    roleBadgeTag.className = "px-3 py-1 rounded-lg text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center gap-1.5 shadow-sm";
+                    roleBadgeTag.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Admin: ${window.userSession.username}`;
+                } else {
+                    roleBadgeTag.className = "px-3 py-1 rounded-lg text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1.5 shadow-sm";
+                    roleBadgeTag.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> Player: ${window.userSession.username}`;
+                }
             }
         }
 
-        // --- Roster Logic ---
+        // Helper to check user permission before executing actions
+        function requireAuth(allowedRoles, actionName, callback) {
+            const currentRole = window.userSession ? window.userSession.role : 'guest';
+
+            if (allowedRoles.includes(currentRole)) {
+                callback();
+            } else {
+                showToast(`Debes iniciar sesión como ${allowedRoles.join(' o ')} para ${actionName}.`, "error");
+                openLoginModal(allowedRoles.includes('admin') ? 'admin' : 'roster');
+            }
+        }
+
+        // --- Roster Management Logic ---
         function requestAddPlayer() {
             const nameInput = document.getElementById('playerNameInput');
+            if (!nameInput) return;
             const name = nameInput.value.trim();
-            if (!name) return;
 
-            if (window.appState.players.includes(name)) {
-                showToast(`El jugador "${name}" ya existe en el roster`, "error");
+            if (!name) {
+                showToast("Por favor ingresa un nombre para el jugador", "error");
                 return;
             }
 
-            window.appState.players.push(name);
-            nameInput.value = '';
-            window.saveDataToCloud();
-            showToast(`Jugador ${name} añadido`, "success");
-        }
+            // Require Roster or Admin permissions to modify player roster
+            requireAuth(['roster', 'admin'], 'añadir jugadores al roster', () => {
+                if (!window.appState.players) window.appState.players = [];
 
-        function requestRemovePlayer(name) {
-            requirePassword(`¿Seguro que quieres eliminar a "${name}" del roster? Se eliminará de la lista de participantes de todos los drops.`, () => {
-                window.appState.players = window.appState.players.filter(p => p !== name);
-                window.appState.drops.forEach(d => {
-                    if (d.participants) delete d.participants[name];
-                });
+                // Check duplicate (case insensitive)
+                const exists = window.appState.players.some(p => p.toLowerCase() === name.toLowerCase());
+                if (exists) {
+                    showToast(`El jugador "${name}" ya existe en el roster`, "error");
+                    return;
+                }
+
+                // Add to state
+                window.appState.players.push(name);
+                nameInput.value = '';
+
+                // Immediate Local Render
+                render();
+
+                // Save to Firebase
                 window.saveDataToCloud();
-                showToast(`Jugador ${name} eliminado`, "info");
+                showToast(`Jugador "${name}" añadido al roster`, "success");
             });
         }
 
-        // --- Rate Management ---
+        function requestRemovePlayer(name) {
+            requireAuth(['admin'], 'eliminar jugadores del roster', () => {
+                if (confirm(`¿Seguro que deseas eliminar a "${name}" del roster?`)) {
+                    window.appState.players = window.appState.players.filter(p => p !== name);
+                    if (window.appState.drops) {
+                        window.appState.drops.forEach(d => {
+                            if (d.participants) delete d.participants[name];
+                        });
+                    }
+                    render();
+                    window.saveDataToCloud();
+                    showToast(`Jugador ${name} eliminado`, "info");
+                }
+            });
+        }
+
+        // --- Rate Management (Función de la Tasa del Oro) ---
         function updateGoldRate() {
-            const val = parseFloat(document.getElementById('goldRateInput').value) || 0;
-            window.appState.goldRate = val;
-            window.saveDataToCloud();
+            const inputEl = document.getElementById('goldRateInput');
+            if (!inputEl) return;
+
+            const val = parseFloat(inputEl.value);
+            window.appState.goldRate = isNaN(val) ? 0 : val;
+
+            // Recalcula la interfaz de inmediato
+            render();
+
+            // Sincroniza con la nube en segundo plano si está disponible
+            if (typeof window.saveDataToCloud === 'function') {
+                window.saveDataToCloud();
+            }
         }
 
         // --- Form Handlers ---
         function handleFormSubmit(e) {
             e.preventDefault();
-            const editingId = document.getElementById('editingId').value;
 
-            const name = document.getElementById('boeName').value.trim();
-            const stat = document.getElementById('boeStat').value;
-            const socket = document.getElementById('boeSocket').value;
-            const priceGold = parseFloat(document.getElementById('boePriceGold').value) || 0;
+            requireAuth(['roster', 'admin'], 'registrar o editar drops BoE', () => {
+                const editingId = document.getElementById('editingId').value;
+                const name = document.getElementById('boeName').value.trim();
+                const stat = document.getElementById('boeStat').value;
+                const socket = document.getElementById('boeSocket').value;
+                const priceGold = parseFloat(document.getElementById('boePriceGold').value) || 0;
 
-            const participants = {};
-            window.appState.players.forEach(p => {
-                const cb = document.getElementById(`cb_${p}`);
-                if (cb && cb.checked) participants[p] = true;
-            });
+                const participants = {};
+                (window.appState.players || []).forEach(p => {
+                    const cb = document.getElementById(`cb_${p}`);
+                    if (cb && cb.checked) participants[p] = true;
+                });
 
-            if (editingId) {
-                // Editing existing requires password
-                requirePassword(`Confirmar cambios para el ítem "${name}"`, () => {
+                if (editingId) {
+                    // Edit drop
                     const dropIndex = window.appState.drops.findIndex(d => d.id == editingId);
                     if (dropIndex !== -1) {
                         window.appState.drops[dropIndex] = {
@@ -1056,40 +998,42 @@
                             participants
                         };
                         cancelEdit();
+                        render();
                         window.saveDataToCloud();
                         showToast("Ítem actualizado exitosamente", "success");
                     }
-                });
-            } else {
-                // Creating new drop
-                window.appState.drops.push({
-                    id: Date.now(),
-                    name,
-                    stat,
-                    socket,
-                    priceGold,
-                    participants
-                });
-                cancelEdit();
-                window.saveDataToCloud();
-                showToast("Drop registrado exitosamente", "success");
-            }
+                } else {
+                    // New drop
+                    window.appState.drops.push({
+                        id: Date.now(),
+                        name,
+                        stat,
+                        socket,
+                        priceGold,
+                        participants
+                    });
+                    cancelEdit();
+                    render();
+                    window.saveDataToCloud();
+                    showToast("Drop registrado exitosamente", "success");
+                }
+            });
         }
 
         function editDrop(id) {
-            const drop = window.appState.drops.find(d => d.id === id);
-            if (!drop) return;
+            requireAuth(['roster', 'admin'], 'editar drops', () => {
+                const drop = window.appState.drops.find(d => d.id === id);
+                if (!drop) return;
 
-            requirePassword(`Permiso requerido para editar "${drop.name}"`, () => {
                 document.getElementById('editingId').value = drop.id;
                 document.getElementById('boeName').value = drop.name;
                 document.getElementById('boeStat').value = drop.stat || '';
                 document.getElementById('boeSocket').value = drop.socket || 'Sin Ranura';
                 document.getElementById('boePriceGold').value = drop.priceGold || '';
 
-                window.appState.players.forEach(p => {
+                (window.appState.players || []).forEach(p => {
                     const cb = document.getElementById(`cb_${p}`);
-                    if (cb) cb.checked = !!drop.participants[p];
+                    if (cb) cb.checked = !!(drop.participants && drop.participants[p]);
                 });
 
                 document.getElementById('formTitleUI').innerText = "Editar BoE Registrado";
@@ -1097,7 +1041,7 @@
                 document.getElementById('btnCancelEdit').classList.remove('hidden');
                 document.getElementById('formModeTag').classList.remove('hidden');
                 document.getElementById('formCardUI').classList.add('border-amber-500/50');
-                
+
                 window.scrollTo({ top: document.getElementById('formCardUI').offsetTop - 80, behavior: 'smooth' });
             });
         }
@@ -1114,18 +1058,21 @@
         }
 
         function deleteDrop(id) {
-            const drop = window.appState.drops.find(d => d.id === id);
-            const dropName = drop ? drop.name : "este registro";
+            requireAuth(['admin'], 'eliminar drops', () => {
+                const drop = window.appState.drops.find(d => d.id === id);
+                const dropName = drop ? drop.name : "este registro";
 
-            requirePassword(`¿Deseas eliminar permanentemente el drop "${dropName}"?`, () => {
-                window.appState.drops = window.appState.drops.filter(d => d.id !== id);
-                window.saveDataToCloud();
-                showToast("Drop eliminado", "info");
+                if (confirm(`¿Deseas eliminar permanentemente el drop "${dropName}"?`)) {
+                    window.appState.drops = window.appState.drops.filter(d => d.id !== id);
+                    render();
+                    window.saveDataToCloud();
+                    showToast("Drop eliminado", "info");
+                }
             });
         }
 
         function selectAllParticipants(checked) {
-            window.appState.players.forEach(p => {
+            (window.appState.players || []).forEach(p => {
                 const cb = document.getElementById(`cb_${p}`);
                 if (cb) cb.checked = checked;
             });
@@ -1133,14 +1080,17 @@
 
         function updateFormCheckboxes() {
             const container = document.getElementById('playerCheckboxesUI');
+            if (!container) return;
             container.innerHTML = '';
 
-            if (window.appState.players.length === 0) {
+            const players = window.appState.players || [];
+
+            if (players.length === 0) {
                 container.innerHTML = `<p class="col-span-full text-xs text-slate-500 text-center py-2">Agrega jugadores al roster para habilitar la selección.</p>`;
                 return;
             }
 
-            window.appState.players.forEach(p => {
+            players.forEach(p => {
                 container.innerHTML += `
                     <label class="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-slate-900 border border-slate-800 hover:border-purple-500/50 cursor-pointer transition select-none text-xs text-slate-200">
                         <input type="checkbox" id="cb_${p}" checked class="rounded border-slate-700 text-purple-600 focus:ring-purple-500 bg-slate-950">
@@ -1154,35 +1104,38 @@
         function render() {
             const players = window.appState.players || [];
             const drops = window.appState.drops || [];
-            const goldRate = window.appState.goldRate || 0;
+            const goldRate = typeof window.appState.goldRate === 'number' ? window.appState.goldRate : 3.7;
             const searchKeyword = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
 
             // Player Badge Count
-            document.getElementById('playerBadgeCount').innerText = players.length;
+            const badgeCount = document.getElementById('playerBadgeCount');
+            if (badgeCount) badgeCount.innerText = players.length;
 
             // Render Player Roster List
             const playerListUI = document.getElementById('playerListUI');
-            playerListUI.innerHTML = '';
-            
-            if (players.length === 0) {
-                playerListUI.innerHTML = `<li class="text-xs text-slate-500 text-center py-4">No hay jugadores en el roster.</li>`;
-            } else {
-                players.forEach(p => {
-                    playerListUI.innerHTML += `
-                        <li class="flex items-center justify-between px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-xs text-slate-200">
-                            <span class="font-medium flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-                                ${p}
-                            </span>
-                            <button onclick="requestRemovePlayer('${p}')" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Eliminar Jugador">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </li>
-                    `;
-                });
+            if (playerListUI) {
+                playerListUI.innerHTML = '';
+
+                if (players.length === 0) {
+                    playerListUI.innerHTML = `<li class="text-xs text-slate-500 text-center py-4">No hay jugadores en el roster.</li>`;
+                } else {
+                    players.forEach(p => {
+                        playerListUI.innerHTML += `
+                            <li class="flex items-center justify-between px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-xs text-slate-200">
+                                <span class="font-medium flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                                    ${p}
+                                </span>
+                                <button onclick="requestRemovePlayer('${p}')" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Eliminar Jugador">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </li>
+                        `;
+                    });
+                }
             }
 
-            if (!document.getElementById('editingId').value) {
+            if (!document.getElementById('editingId')?.value) {
                 updateFormCheckboxes();
             }
 
@@ -1202,94 +1155,98 @@
 
             // Table Render
             const tbody = document.getElementById('dropsTableBodyUI');
-            tbody.innerHTML = '';
+            if (tbody) {
+                tbody.innerHTML = '';
 
-            if (filteredDrops.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-slate-500">
-                            ${searchKeyword ? 'No se encontraron resultados para la búsqueda.' : 'No hay ningún drop registrado aún.'}
-                        </td>
-                    </tr>
-                `;
-            } else {
-                filteredDrops.forEach(drop => {
-                    const activeParticipants = Object.keys(drop.participants || {}).filter(p => drop.participants[p] && players.includes(p));
-                    const count = activeParticipants.length;
-                    const shareGold = count > 0 ? (drop.priceGold / count) : 0;
-
-                    if (drop.priceGold === 0) pendingDropsCount++;
-                    totalGoldReunido += drop.priceGold;
-
-                    activeParticipants.forEach(p => {
-                        totalsGold[p] = (totalsGold[p] || 0) + shareGold;
-                    });
-
-                    const details = [drop.stat, drop.socket].filter(Boolean).join(' · ');
-                    const partBadges = activeParticipants.map(p => `<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] border border-slate-700">${p}</span>`).join(' ') || '<em class="text-slate-600">Ninguno</em>';
-                    const usdValue = (drop.priceGold / 100000) * goldRate;
-
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-900/50 transition">
-                            <td class="px-4 py-3 font-semibold text-slate-100">${drop.name}</td>
-                            <td class="px-4 py-3 text-slate-400">${details || '-'}</td>
-                            <td class="px-4 py-3">
-                                ${drop.priceGold > 0 
-                                    ? `<div><span class="text-amber-400 font-bold">${drop.priceGold.toLocaleString()} g</span></div><div class="text-[10px] text-emerald-400 font-semibold">$${usdValue.toFixed(2)} USD</div>` 
-                                    : `<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20">Pendiente</span>`}
-                            </td>
-                            <td class="px-4 py-3 max-w-[200px] leading-relaxed">
-                                <div class="flex flex-wrap gap-1">${partBadges}</div>
-                            </td>
-                            <td class="px-4 py-3 text-right space-x-1">
-                                <button onclick="editDrop(${drop.id})" class="p-1.5 rounded bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 transition" title="Editar">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </button>
-                                <button onclick="deleteDrop(${drop.id})" class="p-1.5 rounded bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Eliminar">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
+                if (filteredDrops.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-slate-500">
+                                ${searchKeyword ? 'No se encontraron resultados para la búsqueda.' : 'No hay ningún drop registrado aún.'}
                             </td>
                         </tr>
                     `;
-                });
+                } else {
+                    filteredDrops.forEach(drop => {
+                        const activeParticipants = Object.keys(drop.participants || {}).filter(p => drop.participants[p] && players.includes(p));
+                        const count = activeParticipants.length;
+                        const shareGold = count > 0 ? (drop.priceGold / count) : 0;
+
+                        if (drop.priceGold === 0) pendingDropsCount++;
+                        totalGoldReunido += drop.priceGold;
+
+                        activeParticipants.forEach(p => {
+                            totalsGold[p] = (totalsGold[p] || 0) + shareGold;
+                        });
+
+                        const details = [drop.stat, drop.socket].filter(Boolean).join(' · ');
+                        const partBadges = activeParticipants.map(p => `<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] border border-slate-700">${p}</span>`).join(' ') || '<em class="text-slate-600">Ninguno</em>';
+                        const usdValue = (drop.priceGold / 100000) * goldRate;
+
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-900/50 transition">
+                                <td class="px-4 py-3 font-semibold text-slate-100">${drop.name}</td>
+                                <td class="px-4 py-3 text-slate-400">${details || '-'}</td>
+                                <td class="px-4 py-3">
+                                    ${drop.priceGold > 0
+                                ? `<div><span class="text-amber-400 font-bold">${drop.priceGold.toLocaleString()} g</span></div><div class="text-[10px] text-emerald-400 font-semibold">$${usdValue.toFixed(2)} USD</div>`
+                                : `<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20">Pendiente</span>`}
+                                </td>
+                                <td class="px-4 py-3 max-w-[200px] leading-relaxed">
+                                    <div class="flex flex-wrap gap-1">${partBadges}</div>
+                                </td>
+                                <td class="px-4 py-3 text-right space-x-1">
+                                    <button onclick="editDrop(${drop.id})" class="p-1.5 rounded bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 transition" title="Editar">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </button>
+                                    <button onclick="deleteDrop(${drop.id})" class="p-1.5 rounded bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Eliminar">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
             }
 
             // Totals UI
             const totalsContainer = document.getElementById('totalsContainerUI');
-            totalsContainer.innerHTML = '';
+            if (totalsContainer) {
+                totalsContainer.innerHTML = '';
 
-            if (players.length === 0) {
-                totalsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Sin jugadores registrados.</p>`;
-            } else {
-                players.forEach(p => {
-                    const gold = totalsGold[p] || 0;
-                    const usd = (gold / 100000) * goldRate;
+                if (players.length === 0) {
+                    totalsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Sin jugadores registrados.</p>`;
+                } else {
+                    players.forEach(p => {
+                        const gold = totalsGold[p] || 0;
+                        const usd = (gold / 100000) * goldRate;
 
-                    totalsContainer.innerHTML += `
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-slate-800">
-                            <span class="font-semibold text-slate-200">${p}</span>
-                            <div class="text-right">
-                                <span class="text-amber-400 font-bold block">${Math.round(gold).toLocaleString()} g</span>
-                                <span class="text-[10px] text-emerald-400 font-medium block">$${usd.toFixed(2)} USD</span>
+                        totalsContainer.innerHTML += `
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-slate-800">
+                                <span class="font-semibold text-slate-200">${p}</span>
+                                <div class="text-right">
+                                    <span class="text-amber-400 font-bold block">${Math.round(gold).toLocaleString()} g</span>
+                                    <span class="text-[10px] text-emerald-400 font-medium block">$${usd.toFixed(2)} USD</span>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                });
+                        `;
+                    });
+                }
             }
 
             // Metrics Summary Render
             const grandTotalUsd = (totalGoldReunido / 100000) * goldRate;
             const avgGold = players.length > 0 ? (totalGoldReunido / players.length) : 0;
 
-            document.getElementById('statTotalGold').innerText = `${Math.round(totalGoldReunido).toLocaleString()} g`;
-            document.getElementById('statTotalUSD').innerText = `$${grandTotalUsd.toFixed(2)} USD`;
-            document.getElementById('statTotalDrops').innerText = drops.length;
-            document.getElementById('statPendingDrops').innerText = `${pendingDropsCount} ítems`;
-            document.getElementById('statTotalPlayers').innerText = players.length;
-            document.getElementById('statAverageGold').innerText = `${Math.round(avgGold).toLocaleString()} g`;
+            if (document.getElementById('statTotalGold')) document.getElementById('statTotalGold').innerText = `${Math.round(totalGoldReunido).toLocaleString()} g`;
+            if (document.getElementById('statTotalUSD')) document.getElementById('statTotalUSD').innerText = `$${grandTotalUsd.toFixed(2)} USD`;
+            if (document.getElementById('statTotalDrops')) document.getElementById('statTotalDrops').innerText = drops.length;
+            if (document.getElementById('statPendingDrops')) document.getElementById('statPendingDrops').innerText = `${pendingDropsCount} ítems`;
+            if (document.getElementById('statTotalPlayers')) document.getElementById('statTotalPlayers').innerText = players.length;
+            if (document.getElementById('statAverageGold')) document.getElementById('statAverageGold').innerText = `${Math.round(avgGold).toLocaleString()} g`;
         }
 
-        // --- Export Utilities ---
+        // --- Export & Config Utilities ---
         function copyDiscordReport() {
             const players = window.appState.players || [];
             const drops = window.appState.drops || [];
@@ -1341,12 +1298,41 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.appState, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `boe_split_backup_${new Date().toISOString().slice(0,10)}.json`);
+            downloadAnchor.setAttribute("download", `boe_split_backup_${new Date().toISOString().slice(0, 10)}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
             showToast("Copia de seguridad descargada", "success");
         }
+
+        function openAdminConfigModal() {
+            requireAuth(['admin'], 'configurar las contraseñas globales', () => {
+                document.getElementById('newRosterPin').value = window.appState.rosterPin || '';
+                document.getElementById('newAdminPin').value = window.appState.adminPin || '';
+                document.getElementById('adminConfigModal').classList.remove('hidden');
+            });
+        }
+
+        function saveMasterPins() {
+            const newAdmin = document.getElementById('newAdminPin').value.trim();
+            const newRoster = document.getElementById('newRosterPin').value.trim();
+
+            if (newAdmin) window.appState.adminPin = newAdmin;
+            if (newRoster) window.appState.rosterPin = newRoster;
+
+            window.saveDataToCloud();
+            closeAdminConfigModal();
+            showToast("Contraseñas actualizadas con éxito", "success");
+        }
+
+        function closeAdminConfigModal() {
+            document.getElementById('adminConfigModal').classList.add('hidden');
+        }
+
+        // Initialize UI session on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateSessionUI();
+        });
     </script>
 </body>
 
