@@ -450,7 +450,7 @@
                                 </svg>
                                 Historial de Drops / Ventas
                             </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Haz clic en cualquier venta para ver su **Capture** e información detallada.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Haz clic en cualquier venta para ver su <strong>Capture</strong> e información detallada.</p>
                         </div>
 
                         <!-- Search and Filter Bar -->
@@ -542,10 +542,17 @@
                 </button>
             </div>
 
+            <!-- Credentials Hint Box -->
+            <div id="loginHintBox" class="bg-purple-950/40 border border-purple-800/60 p-2.5 rounded-lg text-[11px] text-purple-300">
+                💡 <strong>Claves por defecto:</strong><br>
+                • Jugador / Roster: <code class="bg-black/40 px-1 py-0.5 rounded text-amber-300 font-mono">elites2026</code><br>
+                • Administrador: <code class="bg-black/40 px-1 py-0.5 rounded text-amber-300 font-mono">masterboe2026</code>
+            </div>
+
             <div class="space-y-3 pt-1">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Usuario / Nombre</label>
-                    <input type="text" id="loginUsernameInput" placeholder="Ej: roster o admin"
+                    <input type="text" id="loginUsernameInput" placeholder="Ej: MiPersonaje o admin"
                         onkeyup="if(event.key==='Enter') window.processLogin()"
                         class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-purple-500 transition">
                 </div>
@@ -725,44 +732,9 @@
     <!-- Notification Toast Container -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Firebase Imports Module -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import {
-            getAuth,
-            signInAnonymously,
-            signInWithCustomToken,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import {
-            getFirestore,
-            doc,
-            setDoc,
-            onSnapshot
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global variables provided by environment or default fallback
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'boe-split-wow-default';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyB_GtvoiHmBnjoy-EiDSjn4PkSt9_1hf6s",
-            authDomain: "splits-6188d.firebaseapp.com",
-            projectId: "splits-6188d",
-            storageBucket: "splits-6188d.firebasestorage.app",
-            messagingSenderId: "926796958349",
-            appId: "1:926796958349:web:d67fb26e626895f0d630c4",
-            measurementId: "G-BVLQBG358C"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Standard public artifact document path for shared real-time sync
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'boe_split_store', 'main_doc');
-
-        // Global Application State
+    <!-- Global Application Engine & Functions -->
+    <script>
+        // Synchronous initial global objects
         window.appState = {
             players: [],
             drops: [],
@@ -771,8 +743,15 @@
             rosterPin: "elites2026"
         };
 
-        // Active Session Role State
-        window.userSession = JSON.parse(localStorage.getItem('boe_session_user') || 'null') || { role: 'guest', username: 'Invitado' };
+        window.userSession = (function() {
+            try {
+                return JSON.parse(localStorage.getItem('boe_session_user')) || { role: 'guest', username: 'Invitado' };
+            } catch(e) {
+                return { role: 'guest', username: 'Invitado' };
+            }
+        })();
+
+        let activeLoginTab = 'roster';
 
         // Toast Helper
         window.showToast = function (message, type = "info") {
@@ -796,105 +775,6 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         };
-
-        // Save State to Cloud Function
-        window.saveDataToCloud = async function () {
-            if (!auth.currentUser) {
-                console.warn("No hay usuario autenticado en Firebase aún");
-                return;
-            }
-            try {
-                await setDoc(docRef, {
-                    players: window.appState.players,
-                    drops: window.appState.drops,
-                    goldRate: window.appState.goldRate,
-                    adminPin: window.appState.adminPin,
-                    rosterPin: window.appState.rosterPin,
-                    updatedAt: new Date().toISOString()
-                }, { merge: true });
-
-                const syncEl = document.getElementById('syncStatus');
-                if (syncEl) {
-                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>🟢 Nube Conectada</span>`;
-                }
-            } catch (err) {
-                console.error("Error guardando datos en la nube:", err);
-                window.showToast("Error al guardar datos en Firebase: " + err.message, "error");
-
-                const syncEl = document.getElementById('syncStatus');
-                if (syncEl) {
-                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>🔴 Error al Guardar</span>`;
-                }
-            }
-        };
-
-        // Firestore Realtime Listener
-        function subscribeToFirestore() {
-            onSnapshot(docRef, (snapshot) => {
-                const syncEl = document.getElementById('syncStatus');
-                if (syncEl) {
-                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>🟢 Nube Conectada</span>`;
-                }
-
-                if (snapshot.exists()) {
-                    const data = snapshot.data();
-                    if (data) {
-                        window.appState.players = Array.isArray(data.players) ? data.players : [];
-                        window.appState.drops = Array.isArray(data.drops) ? data.drops : [];
-                        window.appState.goldRate = typeof data.goldRate === 'number' ? data.goldRate : 3.7;
-                        if (data.adminPin) window.appState.adminPin = data.adminPin;
-                        if (data.rosterPin) window.appState.rosterPin = data.rosterPin;
-
-                        const rateEl = document.getElementById('goldRateInput');
-                        if (rateEl && document.activeElement !== rateEl) {
-                            rateEl.value = window.appState.goldRate;
-                        }
-
-                        window.render();
-                    }
-                } else {
-                    // Seed initial data if document doesn't exist
-                    window.saveDataToCloud();
-                }
-            }, (error) => {
-                console.error("Firestore sync error:", error);
-                const syncEl = document.getElementById('syncStatus');
-                if (syncEl) {
-                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>🔴 Sin Conexión</span>`;
-                }
-            });
-        }
-
-        // Initialize Authentication & Start Realtime Listener
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.warn("Error con CustomToken, cambiando a modo anónimo:", err);
-                try { await signInAnonymously(auth); } catch (e) { console.error("Fallo final de Auth:", e); }
-            }
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                subscribeToFirestore();
-            }
-        });
-
-        initAuth();
-    </script>
-
-    <script>
-        // Active Login Tab State
-        let activeLoginTab = 'roster';
 
         /* --- AUTH & MODAL FUNCTIONS --- */
         window.openLoginModal = function(tab = 'roster') {
@@ -928,7 +808,7 @@
                 tabRosterBtn.className = "py-2 text-xs font-bold rounded-md transition text-sky-400 bg-slate-800 shadow";
                 tabAdminBtn.className = "py-2 text-xs font-bold rounded-md transition text-slate-400 hover:text-slate-200";
                 modalTitle.innerText = "Acceso Roster / Jugador";
-                modalSub.innerText = "Ingresa con las credenciales de tu equipo";
+                modalSub.innerText = "Ingresa con tu nombre de personaje y clave de equipo";
                 iconBg.className = "p-2 bg-sky-500/10 rounded-lg text-sky-400";
             } else {
                 tabAdminBtn.className = "py-2 text-xs font-bold rounded-md transition text-purple-400 bg-slate-800 shadow";
@@ -947,18 +827,22 @@
             const correctRosterPass = window.appState.rosterPin || "elites2026";
 
             if (activeLoginTab === 'admin') {
-                if ((username.toLowerCase() === 'admin' || username.length > 0) && password === correctAdminPass) {
+                if (password === correctAdminPass) {
                     window.userSession = { role: 'admin', username: username || 'Administrador' };
                     saveSessionAndNotify();
                 } else {
-                    showLoginError("Contraseña de administrador incorrecta.");
+                    showLoginError("Contraseña de administrador incorrecta (Usa: masterboe2026)");
                 }
             } else { // Roster tab
-                if (username.length > 0 && password === correctRosterPass) {
+                if (!username) {
+                    showLoginError("Por favor ingresa un nombre de usuario o personaje.");
+                    return;
+                }
+                if (password === correctRosterPass || password === correctAdminPass) {
                     window.userSession = { role: 'roster', username: username };
                     saveSessionAndNotify();
                 } else {
-                    showLoginError("Usuario o contraseña de Roster incorrecta.");
+                    showLoginError("Contraseña de Roster incorrecta (Usa: elites2026)");
                 }
             }
         };
@@ -970,15 +854,17 @@
         }
 
         function saveSessionAndNotify() {
-            localStorage.setItem('boe_session_user', JSON.stringify(window.userSession));
+            try {
+                localStorage.setItem('boe_session_user', JSON.stringify(window.userSession));
+            } catch(e){}
             window.closeLoginModal();
-            window.showToast(`Sesión iniciada como ${window.userSession.username} (${window.userSession.role.toUpperCase()})`, "success");
+            window.showToast(`¡Sesión iniciada como ${window.userSession.username}!`, "success");
             window.render();
         }
 
         window.logoutSession = function() {
             window.userSession = { role: 'guest', username: 'Invitado' };
-            localStorage.removeItem('boe_session_user');
+            try { localStorage.removeItem('boe_session_user'); } catch(e){}
             window.showToast("Sesión cerrada correctamente", "info");
             window.render();
         };
@@ -1008,22 +894,21 @@
 
             window.appState.rosterPin = rPin;
             window.appState.adminPin = aPin;
-            window.saveDataToCloud();
+            if (window.saveDataToCloud) window.saveDataToCloud();
             window.closeAdminConfigModal();
-            window.showToast("Contraseñas actualizadas en la nube", "success");
+            window.showToast("Contraseñas actualizadas con éxito", "success");
         };
 
-        /* --- IMAGE CAPTURE UPLOAD & COMPRESSION HANDLERS --- */
+        /* --- IMAGE CAPTURE HANDLERS --- */
         window.handleCaptureSelect = function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             if (!file.type.startsWith('image/')) {
-                window.showToast("Por favor selecciona un archivo de imagen válido", "error");
+                window.showToast("Por favor selecciona una imagen válida", "error");
                 return;
             }
 
-            // Client-side image compression using canvas (max 1000px, 0.75 JPEG quality)
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = function(event) {
@@ -1055,7 +940,7 @@
                     document.getElementById('boeCaptureDataUrl').value = compressedBase64;
                     document.getElementById('capturePreviewImg').src = compressedBase64;
                     document.getElementById('capturePreviewBadge').classList.remove('hidden');
-                    window.showToast("Capture cargado y optimizado correctamente", "success");
+                    window.showToast("Capture cargado y optimizado", "success");
                 };
             };
         };
@@ -1125,7 +1010,7 @@
         /* --- ROSTER & DROP MANAGEMENT FUNCTIONS --- */
         window.requestAddPlayer = function() {
             if (window.userSession.role === 'guest') {
-                window.showToast("Inicia sesión para modificar el Roster", "error");
+                window.showToast("Inicia sesión primero para modificar el Roster", "error");
                 window.openLoginModal('roster');
                 return;
             }
@@ -1133,7 +1018,10 @@
             const input = document.getElementById('playerNameInput');
             const name = input.value.trim();
 
-            if (!name) return;
+            if (!name) {
+                window.showToast("Ingresa el nombre del jugador", "error");
+                return;
+            }
 
             if (window.appState.players.some(p => p.toLowerCase() === name.toLowerCase())) {
                 window.showToast("Este jugador ya está en el Roster.", "error");
@@ -1141,20 +1029,22 @@
             }
 
             window.appState.players.push(name);
-            window.saveDataToCloud();
+            if (window.saveDataToCloud) window.saveDataToCloud();
             input.value = '';
-            window.showToast(`Jugador ${name} añadido al Roster`, "success");
+            window.showToast(`Jugador '${name}' añadido al Roster`, "success");
+            window.render();
         };
 
         window.removePlayer = function(index) {
             if (window.userSession.role !== 'admin') {
-                window.showToast("Solo administradores pueden eliminar jugadores", "error");
+                window.showToast("Solo el administrador puede eliminar jugadores", "error");
                 return;
             }
 
             const removed = window.appState.players.splice(index, 1);
-            window.saveDataToCloud();
+            if (window.saveDataToCloud) window.saveDataToCloud();
             window.showToast(`Jugador ${removed[0]} eliminado`, "info");
+            window.render();
         };
 
         window.selectAllParticipants = function(select) {
@@ -1166,7 +1056,7 @@
             const val = parseFloat(document.getElementById('goldRateInput').value);
             if (!isNaN(val) && val >= 0) {
                 window.appState.goldRate = val;
-                window.saveDataToCloud();
+                if (window.saveDataToCloud) window.saveDataToCloud();
             }
         };
 
@@ -1197,7 +1087,6 @@
             }
 
             if (editingId) {
-                // Edit existing
                 const index = window.appState.drops.findIndex(d => d.id === editingId);
                 if (index !== -1) {
                     window.appState.drops[index] = {
@@ -1213,7 +1102,6 @@
                     window.showToast("Venta actualizada correctamente", "success");
                 }
             } else {
-                // Add new
                 const newDrop = {
                     id: 'drop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
                     name,
@@ -1228,8 +1116,9 @@
                 window.showToast("Nuevo BoE registrado exitosamente", "success");
             }
 
-            window.saveDataToCloud();
+            if (window.saveDataToCloud) window.saveDataToCloud();
             window.resetForm();
+            window.render();
         };
 
         window.editDrop = function(id) {
@@ -1255,13 +1144,11 @@
                 window.removeCapture();
             }
 
-            // Check checkboxes
             const participants = Array.isArray(drop.participants) ? drop.participants : [];
             document.querySelectorAll('.player-checkbox').forEach(cb => {
                 cb.checked = participants.includes(cb.value);
             });
 
-            // Change UI title & buttons
             document.getElementById('formTitleUI').innerText = "Editar Drop / Venta";
             document.getElementById('formModeTag').classList.remove('hidden');
             document.getElementById('btnSubmitText').innerText = "Guardar Cambios";
@@ -1297,8 +1184,9 @@
             }
 
             window.appState.drops = window.appState.drops.filter(d => d.id !== id);
-            window.saveDataToCloud();
+            if (window.saveDataToCloud) window.saveDataToCloud();
             window.showToast("Registro de venta eliminado", "info");
+            window.render();
         };
 
         window.copyDiscordReport = function() {
@@ -1306,7 +1194,7 @@
             const totalGold = window.appState.drops.reduce((acc, d) => acc + (parseFloat(d.priceGold) || 0), 0);
             const totalUSD = ((totalGold / 100000) * window.appState.goldRate).toFixed(2);
 
-            let msg = ````\n=== ⚔️ CONTROL DE REPARTO BOE - WOW ⚔️ ===\n`;
+            let msg = "```\n=== ⚔️ CONTROL DE REPARTO BOE - WOW ⚔️ ===\n";
             msg += `💰 Oro Total: ${totalGold.toLocaleString()} g (~$${totalUSD} USD)\n`;
             msg += `📊 Tasa de Oro: $${window.appState.goldRate} / 100k\n`;
             msg += `-------------------------------------------\n`;
@@ -1316,9 +1204,8 @@
                 const pUsd = ((pGold / 100000) * window.appState.goldRate).toFixed(2);
                 msg += `• ${player.padEnd(16, ' ')}: ${pGold.toLocaleString()} g  ($${pUsd} USD)\n`;
             });
-            msg += `===========================================\n````;
+            msg += "===========================================\n```";
 
-            // Copy via execCommand for browser iframe compatibility
             const tempInput = document.createElement("textarea");
             tempInput.value = msg;
             document.body.appendChild(tempInput);
@@ -1326,7 +1213,7 @@
             document.execCommand("copy");
             document.body.removeChild(tempInput);
 
-            window.showToast("Reporte formateado para Discord copiado al portapapeles", "success");
+            window.showToast("Reporte para Discord copiado al portapapeles", "success");
         };
 
         function calculatePlayerTotals() {
@@ -1352,7 +1239,7 @@
         /* --- MAIN RENDER ENGINE --- */
         window.render = function() {
             const { players, drops, goldRate } = window.appState;
-            const role = window.userSession.role;
+            const role = window.userSession ? window.userSession.role : 'guest';
 
             // 1. Update Auth / Role Header UI
             const roleBadge = document.getElementById('roleBadge');
@@ -1377,7 +1264,7 @@
                 roleBadge.classList.add('hidden');
             }
 
-            // 2. Metrics Cards Calculations
+            // 2. Metrics Cards
             const totalGold = drops.reduce((acc, d) => acc + (parseFloat(d.priceGold) || 0), 0);
             const pendingCount = drops.filter(d => !d.priceGold || parseFloat(d.priceGold) === 0).length;
             const totalUSD = ((totalGold / 100000) * goldRate).toFixed(2);
@@ -1394,7 +1281,7 @@
             // 3. Render Roster Player List
             const playerListUI = document.getElementById('playerListUI');
             if (players.length === 0) {
-                playerListUI.innerHTML = `<li class="text-xs text-slate-500 text-center py-4">No hay jugadores registrados en el roster.</li>`;
+                playerListUI.innerHTML = `<li class="text-xs text-slate-500 text-center py-4">No hay jugadores registrados.</li>`;
             } else {
                 playerListUI.innerHTML = players.map((p, idx) => `
                     <li class="flex items-center justify-between bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 transition text-xs">
@@ -1411,16 +1298,14 @@
                 `).join('');
             }
 
-            // 4. Render Participant Checkboxes in Form
+            // 4. Render Participant Checkboxes
             const playerCheckboxesUI = document.getElementById('playerCheckboxesUI');
             if (players.length === 0) {
                 playerCheckboxesUI.innerHTML = `<p class="col-span-full text-xs text-slate-500 text-center py-2">Agrega jugadores al roster para habilitar la selección.</p>`;
             } else {
-                // Preserve checked status if already rendered
                 const currentlyChecked = Array.from(document.querySelectorAll('.player-checkbox:checked')).map(cb => cb.value);
                 
                 playerCheckboxesUI.innerHTML = players.map(p => {
-                    // Check by default if new form, or preserve check state
                     const isChecked = currentlyChecked.length === 0 || currentlyChecked.includes(p);
                     return `
                         <label class="flex items-center space-x-2 bg-slate-900/80 p-1.5 rounded border border-slate-800 hover:border-slate-700 cursor-pointer select-none transition">
@@ -1457,7 +1342,8 @@
             }
 
             // 6. Render Drops History Table
-            const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
+            const searchInputEl = document.getElementById('searchInput');
+            const searchInput = searchInputEl ? searchInputEl.value.toLowerCase().trim() : '';
             const dropsTableBodyUI = document.getElementById('dropsTableBodyUI');
 
             const filteredDrops = drops.filter(d => {
@@ -1487,7 +1373,6 @@
 
                     return `
                         <tr class="hover:bg-slate-900/60 transition group">
-                            <!-- Item Name & Clickable Modal Opener -->
                             <td class="px-4 py-3 cursor-pointer" onclick="window.openCaptureModal('${drop.id}')">
                                 <div class="font-bold text-purple-300 group-hover:text-amber-300 transition flex items-center gap-2">
                                     <span>${drop.name}</span>
@@ -1501,21 +1386,18 @@
                                 </div>
                             </td>
 
-                            <!-- Attributes -->
                             <td class="px-4 py-3 cursor-pointer" onclick="window.openCaptureModal('${drop.id}')">
                                 <div class="flex flex-wrap gap-1">
                                     ${attrs.length > 0 ? attrs.join('') : '<span class="text-slate-600 text-[10px]">-</span>'}
                                 </div>
                             </td>
 
-                            <!-- Price -->
                             <td class="px-4 py-3 cursor-pointer" onclick="window.openCaptureModal('${drop.id}')">
                                 ${price > 0 
                                     ? `<span class="font-extrabold text-amber-400 text-xs">${price.toLocaleString()} g</span>` 
                                     : `<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20">Pendiente</span>`}
                             </td>
 
-                            <!-- Participants -->
                             <td class="px-4 py-3 cursor-pointer" onclick="window.openCaptureModal('${drop.id}')">
                                 <div class="flex flex-wrap gap-1 max-w-xs">
                                     ${participants.length > 0 
@@ -1524,7 +1406,6 @@
                                 </div>
                             </td>
 
-                            <!-- Capture Indicator Button -->
                             <td class="px-4 py-3 text-center">
                                 <button onclick="window.openCaptureModal('${drop.id}')" title="Ver Capture"
                                     class="px-2.5 py-1 rounded-lg text-xs font-semibold ${drop.captureUrl ? 'bg-purple-950/90 text-purple-300 border border-purple-700/50 hover:bg-purple-900' : 'bg-slate-900 text-slate-500 border border-slate-800 hover:text-slate-300'} transition inline-flex items-center gap-1">
@@ -1537,7 +1418,6 @@
                                 </button>
                             </td>
 
-                            <!-- Actions -->
                             <td class="px-4 py-3 text-right">
                                 <div class="flex items-center justify-end gap-1">
                                     <button onclick="window.editDrop('${drop.id}')" title="Editar Drop"
@@ -1566,8 +1446,127 @@
             }
         };
 
-        // Initialize UI render on script execution
+        // Render immediately on load
         window.render();
+    </script>
+
+    <!-- Firebase Async Sync Module -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            signInWithCustomToken,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'boe-split-wow-default';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_GtvoiHmBnjoy-EiDSjn4PkSt9_1hf6s",
+            authDomain: "splits-6188d.firebaseapp.com",
+            projectId: "splits-6188d",
+            storageBucket: "splits-6188d.firebasestorage.app",
+            messagingSenderId: "926796958349",
+            appId: "1:926796958349:web:d67fb26e626895f0d630c4",
+            measurementId: "G-BVLQBG358C"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'boe_split_store', 'main_doc');
+
+        window.saveDataToCloud = async function () {
+            if (!auth.currentUser) return;
+            try {
+                await setDoc(docRef, {
+                    players: window.appState.players,
+                    drops: window.appState.drops,
+                    goldRate: window.appState.goldRate,
+                    adminPin: window.appState.adminPin,
+                    rosterPin: window.appState.rosterPin,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
+                const syncEl = document.getElementById('syncStatus');
+                if (syncEl) {
+                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>🟢 Nube Conectada</span>`;
+                }
+            } catch (err) {
+                console.error("Error guardando datos:", err);
+                const syncEl = document.getElementById('syncStatus');
+                if (syncEl) {
+                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>🔴 Error al Guardar</span>`;
+                }
+            }
+        };
+
+        function subscribeToFirestore() {
+            onSnapshot(docRef, (snapshot) => {
+                const syncEl = document.getElementById('syncStatus');
+                if (syncEl) {
+                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>🟢 Nube Conectada</span>`;
+                }
+
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    if (data) {
+                        window.appState.players = Array.isArray(data.players) ? data.players : [];
+                        window.appState.drops = Array.isArray(data.drops) ? data.drops : [];
+                        window.appState.goldRate = typeof data.goldRate === 'number' ? data.goldRate : 3.7;
+                        if (data.adminPin) window.appState.adminPin = data.adminPin;
+                        if (data.rosterPin) window.appState.rosterPin = data.rosterPin;
+
+                        const rateEl = document.getElementById('goldRateInput');
+                        if (rateEl && document.activeElement !== rateEl) {
+                            rateEl.value = window.appState.goldRate;
+                        }
+
+                        window.render();
+                    }
+                } else {
+                    window.saveDataToCloud();
+                }
+            }, (error) => {
+                console.error("Firestore sync error:", error);
+                const syncEl = document.getElementById('syncStatus');
+                if (syncEl) {
+                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>🔴 Sin Conexión</span>`;
+                }
+            });
+        }
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                try { await signInAnonymously(auth); } catch (e) {}
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                subscribeToFirestore();
+            }
+        });
+
+        initAuth();
     </script>
 </body>
 
