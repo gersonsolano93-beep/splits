@@ -647,16 +647,16 @@
 
         // Global variables provided by canvas environment fallback
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'boe-split-wow-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined'
-            ? JSON.parse(__firebase_config)
-            : {
-                apiKey: "AIzaSyDummyKeyForFallbackPurposeOnly",
-                authDomain: "boe-split-wow.firebaseapp.com",
-                projectId: "boe-split-wow",
-                storageBucket: "boe-split-wow.appspot.com",
-                messagingSenderId: "123456789",
-                appId: "1:123456789:web:abcdef"
-            };
+        // Configuración real de tu proyecto Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_GtvoiHmEnjoy-ElDSjm4PKSt9_1hf6s",
+            authDomain: "splits-6188d.firebaseapp.com",
+            projectId: "splits-6188d",
+            storageBucket: "splits-6188d.firebasestorage.app",
+            messagingSenderId: "926796958349",
+            appId: "1:926796958349:web:d67fb26e626895f0d630c4",
+            measurementId: "G-BVLQBG358C"
+        };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
