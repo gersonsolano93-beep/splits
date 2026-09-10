@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Reparto BoE - WoW</title>
+    <title>Control de Reparto BoE - WoW con Sistema de Deudas</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -21,6 +21,7 @@
                             legendary: '#FF8000', /* Legendary Orange */
                             gold: '#FFD700', /* Gold */
                             usd: '#22C55E', /* Green USD */
+                            debt: '#EF4444', /* Red Debt */
                         }
                     }
                 }
@@ -64,6 +65,10 @@
             text-shadow: 0 0 10px rgba(163, 53, 238, 0.4);
         }
 
+        .text-glow-debt {
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
         /* Pulse highlight for active player search */
         .player-highlighted {
             animation: highlightPulse 2s infinite alternate;
@@ -97,7 +102,7 @@
                             class="text-xs px-2 py-0.5 rounded-full bg-purple-900/50 text-purple-300 border border-purple-500/30">WoW
                             Pro</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Sincronizado en tiempo real con soporte para Captures y Looter ID</p>
+                    <p class="text-xs text-slate-400">Sincronizado en tiempo real · Control de Looter y Deudas</p>
                 </div>
             </div>
 
@@ -107,7 +112,7 @@
                 <div id="syncStatus"
                     class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                    <span>Conectando a Firebase...</span>
+                    <span>Modo Local / Nube</span>
                 </div>
 
                 <!-- User Session / Login Area -->
@@ -148,7 +153,7 @@
                         class="p-1.5 bg-slate-800 hover:bg-rose-900/50 text-slate-300 hover:text-rose-300 rounded-lg border border-slate-700 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                d="M17 16l4-4m0 0l4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
                             </path>
                         </svg>
                     </button>
@@ -160,7 +165,7 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
 
         <!-- Top Metrics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <!-- Total Gold -->
             <div class="bg-wow-card p-4 rounded-xl border border-wow-border relative overflow-hidden shadow-sm">
                 <div class="flex justify-between items-start">
@@ -179,6 +184,27 @@
                 <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
                     <span>Equivalente estimado:</span>
                     <span id="statTotalUSD" class="text-wow-usd font-bold">$0.00 USD</span>
+                </div>
+            </div>
+
+            <!-- NEW METRIC: Total Debts / Adelantos -->
+            <div class="bg-wow-card p-4 rounded-xl border border-rose-900/40 relative overflow-hidden shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs uppercase font-bold tracking-wider text-rose-400">Total Adelantos / Deudas</p>
+                        <h3 id="statTotalDebts" class="text-2xl font-black text-rose-400 mt-1 text-glow-debt">0 g</h3>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-rose-500/10 text-rose-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Descontado en totales:</span>
+                    <span id="statDebtsCount" class="text-rose-300 font-bold">0 jug. con deuda</span>
                 </div>
             </div>
 
@@ -242,14 +268,14 @@
                         </svg>
                     </div>
                 </div>
-                <p class="mt-2 text-[11px] text-slate-400">Cálculo en vivo sincronizado en la nube.</p>
+                <p class="mt-2 text-[11px] text-slate-400">Cálculo en vivo sincronizado.</p>
             </div>
         </div>
 
         <!-- Main Content Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            <!-- Left Panel: Roster & Totals (4 cols) -->
+            <!-- Left Panel: Roster & Totals with Debt System (4 cols) -->
             <div class="lg:col-span-4 space-y-6">
 
                 <!-- Roster Section -->
@@ -290,17 +316,20 @@
                     </div>
                 </div>
 
-                <!-- Totals Breakdown Section -->
+                <!-- Totals Breakdown Section with Debt Discounts -->
                 <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-sm space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            Totales a Pagar por Jugador
-                        </h2>
+                        <div>
+                            <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                Totales a Pagar por Jugador
+                            </h2>
+                            <p class="text-[11px] text-slate-400">Monto ganado menos adelantos/deudas asignadas.</p>
+                        </div>
                         <button onclick="window.copyDiscordReport()"
                             class="text-xs px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 hover:bg-indigo-600/50 border border-indigo-500/30 transition flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,7 +341,7 @@
                         </button>
                     </div>
 
-                    <div id="totalsContainerUI" class="space-y-2 max-h-80 overflow-y-auto pr-1 text-sm">
+                    <div id="totalsContainerUI" class="space-y-2 max-h-96 overflow-y-auto pr-1 text-sm">
                         <p class="text-xs text-slate-500 text-center py-4">Cargando desglose de pagos...</p>
                     </div>
                 </div>
@@ -360,7 +389,7 @@
                             </div>
                         </div>
 
-                        <!-- NEW FIELD: Looter / A quién le cayó + Stats Row -->
+                        <!-- Looter / A quién le cayó + Stats Row -->
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <!-- Drop Winner / Looter -->
                             <div class="sm:col-span-1">
@@ -474,7 +503,7 @@
                                 </svg>
                                 Historial de Drops / Ventas
                             </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Haz clic en cualquier participante o usa el filtro para <strong>resaltar a un jugador</strong>.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Haz clic en cualquier participante para <strong>resaltar a un jugador</strong>.</p>
                         </div>
 
                         <!-- Search and Interactive Player Highlight Controls -->
@@ -536,10 +565,88 @@
     <footer class="bg-wow-card border-t border-wow-border py-4 mt-8">
         <div
             class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <span>Control de Reparto BoE - World of Warcraft</span>
+            <span>Control de Reparto BoE & Sistema de Deudas - World of Warcraft</span>
             <span class="text-slate-600">Sincronizado vía Firebase Cloud · Listo para Producción</span>
         </div>
     </footer>
+
+
+    <!-- MODAL: DEBT / GOLD ADVANCE MANAGEMENT (ADMIN ONLY) -->
+    <div id="debtModal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-wow-card border border-rose-900/50 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-2 bg-rose-500/10 rounded-lg text-rose-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-slate-100 text-base">Asignar Deuda / Adelanto de Oro</h3>
+                        <p id="debtModalPlayerSubtitle" class="text-xs text-rose-400 font-semibold">Jugador: ---</p>
+                    </div>
+                </div>
+                <button onclick="window.closeDebtModal()"
+                    class="text-slate-500 hover:text-slate-300 text-xl font-bold p-1">&times;</button>
+            </div>
+
+            <input type="hidden" id="debtModalPlayerName" value="">
+
+            <div class="bg-rose-950/30 border border-rose-900/40 p-3 rounded-lg text-xs space-y-1">
+                <p class="text-rose-200 font-medium">
+                    ⚠️ <strong>Atención Administrador:</strong> El monto ingresado se sumará o establecerá como oro entregado por adelantado.
+                </p>
+                <p class="text-slate-400">
+                    Se restará automáticamente del total a pagar a este jugador en el reparto BoE.
+                </p>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Monto de Oro Adelantado (Deuda)</label>
+                    <div class="relative">
+                        <input type="number" id="debtAmountInput" min="0" step="any" placeholder="Ej: 50000"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-8 py-2 text-sm text-rose-300 font-extrabold focus:outline-none focus:border-rose-500 transition">
+                        <span class="absolute right-3 top-2 text-xs font-bold text-rose-500">g</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Modo de Modificación</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800 cursor-pointer text-xs">
+                            <input type="radio" name="debtMode" value="set" checked class="accent-rose-500">
+                            <span class="text-slate-200">Fijar Monto Total</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800 cursor-pointer text-xs">
+                            <input type="radio" name="debtMode" value="add" class="accent-rose-500">
+                            <span class="text-slate-200">Sumar al Adelanto</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button type="button" onclick="window.clearDebtForPlayer()"
+                    class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-semibold rounded-lg transition border border-rose-900/30">
+                    Saldar / Limpiar Deuda
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="window.closeDebtModal()"
+                        class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="window.savePlayerDebt()"
+                        class="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-lg transition shadow-lg shadow-rose-950/50">
+                        Guardar Deuda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: Custom Login Modal -->
     <div id="loginModal"
@@ -578,9 +685,9 @@
 
             <!-- Credentials Hint Box -->
             <div id="loginHintBox" class="bg-purple-950/40 border border-purple-800/60 p-2.5 rounded-lg text-[11px] text-purple-300">
-                💡 <strong>Sistema para BoE:</strong><br>
-                • Jugador / Roster: <code class="bg-black/40 px-1 py-0.5 rounded text-amber-300 font-mono">La Elite</code><br>
-                • Administradores: <code class="bg-black/40 px-1 py-0.5 rounded text-amber-300 font-mono">Pacheco y Ryu</code>
+                💡 <strong>Claves por defecto:</strong><br>
+                • Roster: <code class="bg-black/40 px-1 py-0.5 rounded text-amber-300 font-mono">elites2026</code><br>
+                • Admin: <code class="bg-black/40 px-1 py-0.5 rounded text-amber-300 font-mono">masterboe2026</code>
             </div>
 
             <div class="space-y-3 pt-1">
@@ -712,7 +819,7 @@
                     </div>
                 </div>
 
-                <!-- NEW: Obtenido por / Looter Highlight Box -->
+                <!-- Obtenido por / Looter Highlight Box -->
                 <div class="bg-gradient-to-r from-amber-950/40 via-purple-950/30 to-slate-900/60 p-3 rounded-xl border border-amber-500/30 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-lg">⭐</span>
@@ -730,7 +837,6 @@
                 <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-800/80">
                     <span class="block text-xs font-bold text-slate-400 mb-1.5">Participantes (<span id="modalParticipantsCount">0</span>):</span>
                     <div id="modalParticipantsList" class="flex flex-wrap gap-1.5">
-                        <!-- Rendered list of badges -->
                     </div>
                 </div>
 
@@ -782,10 +888,11 @@
 
     <!-- Global Application Engine & Functions -->
     <script>
-        // Synchronous initial global objects
+        // Synchronous initial global state object
         window.appState = {
             players: [],
             drops: [],
+            debts: {}, // Debt mapping: { playerName: amountInGold }
             goldRate: 3.7,
             adminPin: "masterboe2026",
             rosterPin: "elites2026",
@@ -840,6 +947,78 @@
             window.render();
         };
 
+        /* --- DEBT SYSTEM (ADMINISTRATOR ONLY) --- */
+        window.openDebtModal = function(playerName) {
+            if (window.userSession.role !== 'admin') {
+                window.showToast("Solo los administradores pueden editar deudas y adelantos.", "error");
+                return;
+            }
+
+            document.getElementById('debtModalPlayerName').value = playerName;
+            document.getElementById('debtModalPlayerSubtitle').innerText = `Jugador: ${playerName}`;
+
+            const currentDebt = window.appState.debts[playerName] || 0;
+            document.getElementById('debtAmountInput').value = currentDebt > 0 ? currentDebt : '';
+
+            document.getElementById('debtModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('debtAmountInput').focus(), 100);
+        };
+
+        window.closeDebtModal = function() {
+            document.getElementById('debtModal').classList.add('hidden');
+        };
+
+        window.savePlayerDebt = function() {
+            if (window.userSession.role !== 'admin') {
+                window.showToast("Solo los administradores pueden modificar deudas.", "error");
+                return;
+            }
+
+            const playerName = document.getElementById('debtModalPlayerName').value;
+            const amountInput = parseFloat(document.getElementById('debtAmountInput').value) || 0;
+            const mode = document.querySelector('input[name="debtMode"]:checked')?.value || 'set';
+
+            if (!playerName) return;
+
+            if (amountInput < 0) {
+                window.showToast("El monto no puede ser negativo", "error");
+                return;
+            }
+
+            if (!window.appState.debts) window.appState.debts = {};
+
+            if (mode === 'add') {
+                const existing = window.appState.debts[playerName] || 0;
+                window.appState.debts[playerName] = Math.max(0, existing + amountInput);
+            } else {
+                window.appState.debts[playerName] = Math.max(0, amountInput);
+            }
+
+            if (window.saveDataToCloud) window.saveDataToCloud();
+            window.closeDebtModal();
+            window.showToast(`Deuda de '${playerName}' actualizada a ${window.appState.debts[playerName].toLocaleString()} g`, "success");
+            window.render();
+        };
+
+        window.clearDebtForPlayer = function() {
+            if (window.userSession.role !== 'admin') {
+                window.showToast("Solo los administradores pueden saldar deudas.", "error");
+                return;
+            }
+
+            const playerName = document.getElementById('debtModalPlayerName').value;
+            if (!playerName) return;
+
+            if (window.appState.debts) {
+                delete window.appState.debts[playerName];
+            }
+
+            if (window.saveDataToCloud) window.saveDataToCloud();
+            window.closeDebtModal();
+            window.showToast(`Deuda de '${playerName}' ha sido saldada por completo.`, "info");
+            window.render();
+        };
+
         /* --- AUTH & MODAL FUNCTIONS --- */
         window.openLoginModal = function(tab = 'roster') {
             window.switchLoginTab(tab);
@@ -878,7 +1057,7 @@
                 tabAdminBtn.className = "py-2 text-xs font-bold rounded-md transition text-purple-400 bg-slate-800 shadow";
                 tabRosterBtn.className = "py-2 text-xs font-bold rounded-md transition text-slate-400 hover:text-slate-200";
                 modalTitle.innerText = "Acceso Administrador";
-                modalSub.innerText = "Control total y permisos de gestión";
+                modalSub.innerText = "Control total y permisos de gestión de deudas";
                 iconBg.className = "p-2 bg-purple-500/10 rounded-lg text-purple-400";
             }
         };
@@ -895,7 +1074,7 @@
                     window.userSession = { role: 'admin', username: username || 'Administrador' };
                     saveSessionAndNotify();
                 } else {
-                    showLoginError("Contraseña de administrador incorrecta (Usa: masterboe2026)");
+                    showLoginError("Contraseña de administrador incorrecta");
                 }
             } else { // Roster tab
                 if (!username) {
@@ -904,13 +1083,12 @@
                 }
                 if (password === correctRosterPass || password === correctAdminPass) {
                     window.userSession = { role: 'roster', username: username };
-                    // Auto-highlight logged in user if they are in roster
                     if (window.appState.players.includes(username)) {
                         window.appState.highlightedPlayer = username;
                     }
                     saveSessionAndNotify();
                 } else {
-                    showLoginError("Contraseña de Roster incorrecta (Usa: elites2026)");
+                    showLoginError("Contraseña de Roster incorrecta");
                 }
             }
         };
@@ -1045,7 +1223,6 @@
             if (drop.socket && drop.socket !== 'Sin Ranura') attrs.push(drop.socket);
             document.getElementById('modalAttributes').innerText = attrs.length > 0 ? attrs.join(' · ') : 'Sin Terciaria / Socket';
 
-            // Display LOOTER info in modal
             const looterName = drop.looter || 'No especificado';
             document.getElementById('modalLooterName').innerText = looterName;
 
@@ -1130,6 +1307,9 @@
             }
 
             const removed = window.appState.players.splice(index, 1);
+            if (window.appState.debts && removed[0]) {
+                delete window.appState.debts[removed[0]];
+            }
             if (window.saveDataToCloud) window.saveDataToCloud();
             window.showToast(`Jugador ${removed[0]} eliminado`, "info");
             window.render();
@@ -1159,7 +1339,7 @@
 
             const name = document.getElementById('boeName').value.trim();
             const priceGold = parseFloat(document.getElementById('boePriceGold').value) || 0;
-            const looter = document.getElementById('boeLooter').value.trim(); // LOOTER FIELD
+            const looter = document.getElementById('boeLooter').value.trim();
             const stat = document.getElementById('boeStat').value;
             const socket = document.getElementById('boeSocket').value;
             const captureUrl = document.getElementById('boeCaptureDataUrl').value || null;
@@ -1170,7 +1350,6 @@
                 selectedPlayers.push(cb.value);
             });
 
-            // Ensure looter is included in participants if selected
             if (looter && !selectedPlayers.includes(looter)) {
                 selectedPlayers.push(looter);
             }
@@ -1292,17 +1471,24 @@
             const totalGold = window.appState.drops.reduce((acc, d) => acc + (parseFloat(d.priceGold) || 0), 0);
             const totalUSD = ((totalGold / 100000) * window.appState.goldRate).toFixed(2);
 
-            let msg = "```\n=== ⚔️ CONTROL DE REPARTO BOE - WOW ⚔️ ===\n";
-            msg += `💰 Oro Total: ${totalGold.toLocaleString()} g (~$${totalUSD} USD)\n`;
+            let msg = "```\n=== ⚔️ CONTROL DE REPARTO BOE & DEUDAS - WOW ⚔️ ===\n";
+            msg += `💰 Oro Total Reunido: ${totalGold.toLocaleString()} g (~$${totalUSD} USD)\n`;
             msg += `📊 Tasa de Oro: $${window.appState.goldRate} / 100k\n`;
-            msg += `-------------------------------------------\n`;
+            msg += `----------------------------------------------------\n`;
             
             Object.keys(totals).forEach(player => {
-                const pGold = Math.round(totals[player].gold);
-                const pUsd = ((pGold / 100000) * window.appState.goldRate).toFixed(2);
-                msg += `• ${player.padEnd(16, ' ')}: ${pGold.toLocaleString()} g  ($${pUsd} USD)\n`;
+                const grossGold = Math.round(totals[player].grossGold);
+                const debt = Math.round(totals[player].debt);
+                const netGold = Math.round(totals[player].netGold);
+                const netUsd = ((netGold / 100000) * window.appState.goldRate).toFixed(2);
+
+                if (debt > 0) {
+                    msg += `• ${player.padEnd(14, ' ')}: ${netGold.toLocaleString()} g NETO (Ganado: ${grossGold.toLocaleString()}g - Adelanto: ${debt.toLocaleString()}g) | $${netUsd} USD\n`;
+                } else {
+                    msg += `• ${player.padEnd(14, ' ')}: ${netGold.toLocaleString()} g  ($${netUsd} USD)\n`;
+                }
             });
-            msg += "===========================================\n```";
+            msg += "================================--------------------\n```";
 
             const tempInput = document.createElement("textarea");
             tempInput.value = msg;
@@ -1311,12 +1497,14 @@
             document.execCommand("copy");
             document.body.removeChild(tempInput);
 
-            window.showToast("Reporte para Discord copiado al portapapeles", "success");
+            window.showToast("Reporte con deudas copiado al portapapeles", "success");
         };
 
         function calculatePlayerTotals() {
             const totals = {};
-            window.appState.players.forEach(p => totals[p] = { gold: 0, itemsCount: 0 });
+            const debts = window.appState.debts || {};
+
+            window.appState.players.forEach(p => totals[p] = { grossGold: 0, debt: debts[p] || 0, netGold: 0, itemsCount: 0 });
 
             window.appState.drops.forEach(drop => {
                 const price = parseFloat(drop.priceGold) || 0;
@@ -1324,11 +1512,18 @@
                 if (participants.length > 0 && price > 0) {
                     const split = price / participants.length;
                     participants.forEach(p => {
-                        if (!totals[p]) totals[p] = { gold: 0, itemsCount: 0 };
-                        totals[p].gold += split;
+                        if (!totals[p]) totals[p] = { grossGold: 0, debt: debts[p] || 0, netGold: 0, itemsCount: 0 };
+                        totals[p].grossGold += split;
                         totals[p].itemsCount += 1;
                     });
                 }
+            });
+
+            // Calculate Net Gold = Gross Gold - Debt
+            Object.keys(totals).forEach(p => {
+                const d = debts[p] || 0;
+                totals[p].debt = d;
+                totals[p].netGold = totals[p].grossGold - d;
             });
 
             return totals;
@@ -1336,7 +1531,7 @@
 
         /* --- MAIN RENDER ENGINE --- */
         window.render = function() {
-            const { players, drops, goldRate, highlightedPlayer } = window.appState;
+            const { players, drops, debts = {}, goldRate, highlightedPlayer } = window.appState;
             const role = window.userSession ? window.userSession.role : 'guest';
 
             // 1. Update Auth / Role Header UI
@@ -1368,8 +1563,14 @@
             const totalUSD = ((totalGold / 100000) * goldRate).toFixed(2);
             const avgGoldPerPlayer = players.length > 0 ? (totalGold / players.length) : 0;
 
+            // Debts Metrics
+            const totalDebtsGold = Object.values(debts).reduce((acc, val) => acc + (parseFloat(val) || 0), 0);
+            const playersWithDebtCount = Object.values(debts).filter(val => parseFloat(val) > 0).length;
+
             document.getElementById('statTotalGold').innerText = `${totalGold.toLocaleString()} g`;
             document.getElementById('statTotalUSD').innerText = `$${totalUSD} USD`;
+            document.getElementById('statTotalDebts').innerText = `${totalDebtsGold.toLocaleString()} g`;
+            document.getElementById('statDebtsCount').innerText = `${playersWithDebtCount} jug. con adelantos`;
             document.getElementById('statTotalDrops').innerText = drops.length;
             document.getElementById('statPendingDrops').innerText = `${pendingCount} pendientes`;
             document.getElementById('statTotalPlayers').innerText = players.length;
@@ -1399,17 +1600,25 @@
             } else {
                 playerListUI.innerHTML = players.map((p, idx) => {
                     const isHighlighted = highlightedPlayer === p;
+                    const pDebt = debts[p] || 0;
+
                     return `
                     <li onclick="window.setHighlightedPlayer('${isHighlighted ? '' : p}')" class="cursor-pointer flex items-center justify-between ${isHighlighted ? 'bg-amber-950/80 border-amber-400 ring-1 ring-amber-400' : 'bg-slate-900/70 hover:bg-slate-900 border-slate-800'} border rounded-lg px-3 py-1.5 transition text-xs">
                         <span class="font-semibold ${isHighlighted ? 'text-amber-300 font-bold' : 'text-slate-200'} flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 rounded-full ${isHighlighted ? 'bg-amber-400 animate-pulse' : 'bg-sky-400'}"></span>
                             ${p}
+                            ${pDebt > 0 ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-800" title="Deuda pendiente">Deuda: -${pDebt.toLocaleString()}g</span>` : ''}
                         </span>
-                        ${role === 'admin' ? `
-                            <button onclick="event.stopPropagation(); window.removePlayer(${idx})" title="Eliminar jugador" class="text-slate-500 hover:text-rose-400 p-1 transition">
-                                &times;
-                            </button>
-                        ` : ''}
+                        <div class="flex items-center gap-1">
+                            ${role === 'admin' ? `
+                                <button onclick="event.stopPropagation(); window.openDebtModal('${p}')" title="Administrar Deuda / Adelanto" class="text-rose-400 hover:text-rose-200 p-1 text-[11px] font-bold bg-rose-950/40 rounded border border-rose-900/40">
+                                    💳 Deuda
+                                </button>
+                                <button onclick="event.stopPropagation(); window.removePlayer(${idx})" title="Eliminar jugador" class="text-slate-500 hover:text-rose-400 p-1 transition">
+                                    &times;
+                                </button>
+                            ` : ''}
+                        </div>
                     </li>
                 `}).join('');
             }
@@ -1432,7 +1641,7 @@
                 }).join('');
             }
 
-            // 5. Render Player Totals Breakdown
+            // 5. Render Player Totals Breakdown (With Debt Subtraction)
             const totalsContainerUI = document.getElementById('totalsContainerUI');
             const playerTotals = calculatePlayerTotals();
 
@@ -1440,17 +1649,33 @@
                 totalsContainerUI.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Añade jugadores para ver el desglose.</p>`;
             } else {
                 totalsContainerUI.innerHTML = players.map(p => {
-                    const gold = Math.round(playerTotals[p]?.gold || 0);
-                    const usd = ((gold / 100000) * goldRate).toFixed(2);
+                    const grossGold = Math.round(playerTotals[p]?.grossGold || 0);
+                    const debtGold = Math.round(playerTotals[p]?.debt || 0);
+                    const netGold = Math.round(playerTotals[p]?.netGold || 0);
+                    const usd = ((netGold / 100000) * goldRate).toFixed(2);
                     const isHighlighted = highlightedPlayer === p;
+
+                    const netColorClass = netGold < 0 ? 'text-rose-400 font-extrabold' : 'text-amber-300 font-extrabold';
+
                     return `
                         <div onclick="window.setHighlightedPlayer('${isHighlighted ? '' : p}')" class="cursor-pointer flex items-center justify-between p-2.5 ${isHighlighted ? 'bg-amber-950/70 border-amber-500 ring-1 ring-amber-400' : 'bg-slate-900/60 border-slate-800 hover:border-purple-900/50'} rounded-lg border transition">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full ${isHighlighted ? 'bg-amber-300 animate-ping' : 'bg-amber-400'}"></span>
-                                <span class="font-bold ${isHighlighted ? 'text-amber-300 text-xs' : 'text-slate-200 text-xs'}">${p}</span>
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full ${isHighlighted ? 'bg-amber-300 animate-ping' : 'bg-amber-400'}"></span>
+                                    <span class="font-bold ${isHighlighted ? 'text-amber-300 text-xs' : 'text-slate-200 text-xs'}">${p}</span>
+                                    ${role === 'admin' ? `
+                                        <button onclick="event.stopPropagation(); window.openDebtModal('${p}')" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 transition">
+                                            ${debtGold > 0 ? 'Editar Deuda' : '+ Adelanto'}
+                                        </button>
+                                    ` : ''}
+                                </div>
+                                <div class="text-[10px] text-slate-400 mt-0.5">
+                                    Bruto: ${grossGold.toLocaleString()} g ${debtGold > 0 ? `<span class="text-rose-400 font-semibold">| Adelanto: -${debtGold.toLocaleString()} g</span>` : ''}
+                                </div>
                             </div>
+
                             <div class="text-right">
-                                <span class="block font-black text-amber-300 text-xs">${gold.toLocaleString()} g</span>
+                                <span class="block ${netColorClass} text-xs">${netGold.toLocaleString()} g NETO</span>
                                 <span class="block text-[10px] text-emerald-400 font-semibold">$${usd} USD</span>
                             </div>
                         </div>
@@ -1518,7 +1743,6 @@
                                     : `<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20">Pendiente</span>`}
                             </td>
 
-                            <!-- PARTICIPANTS & LOOTER HIGHLIGHT COLUMN -->
                             <td class="px-4 py-3">
                                 <div class="flex flex-wrap gap-1 max-w-sm">
                                     ${participants.length > 0 
@@ -1527,63 +1751,44 @@
                                             const isHighlighted = highlightedPlayer && highlightedPlayer === p;
 
                                             if (isLooter) {
-                                                // LOOTER HIGHLIGHT BADGE (⭐)
                                                 return `<span onclick="window.setHighlightedPlayer('${isHighlighted ? '' : p}')" 
-                                                    title="⭐ Le cayó a ${p} (Looter). Haz clic para resaltar." 
-                                                    class="cursor-pointer inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-bold text-[10px] bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 border border-amber-300 shadow-sm transition hover:scale-105 ${isHighlighted ? 'ring-2 ring-yellow-300' : ''}">
-                                                    <span>⭐</span>
-                                                    <span>${p}</span>
-                                                </span>`;
-                                            } else if (isHighlighted) {
-                                                // USER SELECTED HIGHLIGHT BADGE
-                                                return `<span onclick="window.setHighlightedPlayer('')" 
-                                                    title="Jugador resaltado. Haz clic para quitar resaltado." 
-                                                    class="cursor-pointer inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-extrabold text-[10px] bg-yellow-400 text-slate-950 border border-amber-300 ring-2 ring-yellow-300 transition">
-                                                    <span>👉</span>
-                                                    <span>${p}</span>
-                                                </span>`;
-                                            } else {
-                                                // NORMAL PARTICIPANT BADGE
-                                                return `<span onclick="window.setHighlightedPlayer('${p}')" 
-                                                    title="Haz clic para resaltar a ${p}" 
-                                                    class="cursor-pointer px-1.5 py-0.5 bg-slate-800 hover:bg-purple-900/60 text-slate-300 hover:text-purple-200 rounded text-[10px] transition">
-                                                    ${p}
+                                                    title="⭐ Le cayó a ${p} (Looter)." 
+                                                    class="cursor-pointer inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-bold text-[10px] bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 border border-amber-300 shadow">
+                                                    ⭐ ${p}
                                                 </span>`;
                                             }
-                                        }).join('')
+
+                                            return `<span onclick="window.setHighlightedPlayer('${isHighlighted ? '' : p}')" 
+                                                class="cursor-pointer px-1.5 py-0.5 rounded text-[10px] font-medium transition ${isHighlighted ? 'bg-yellow-400 text-slate-950 font-bold border border-amber-300' : 'bg-slate-900 text-slate-300 border border-slate-800 hover:border-purple-600'}">
+                                                ${p}
+                                            </span>`;
+                                        }).join('') 
                                         : '<span class="text-slate-600 text-[10px]">Sin asignación</span>'}
                                 </div>
                             </td>
 
                             <td class="px-4 py-3 text-center">
-                                <button onclick="window.openCaptureModal('${drop.id}')" title="Ver Capture"
-                                    class="px-2.5 py-1 rounded-lg text-xs font-semibold ${drop.captureUrl ? 'bg-purple-950/90 text-purple-300 border border-purple-700/50 hover:bg-purple-900' : 'bg-slate-900 text-slate-500 border border-slate-800 hover:text-slate-300'} transition inline-flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                        </path>
-                                    </svg>
-                                    <span>${drop.captureUrl ? 'Ver Capture' : 'Sin Capture'}</span>
-                                </button>
+                                ${drop.captureUrl ? `
+                                    <button onclick="window.openCaptureModal('${drop.id}')" class="p-1 text-purple-400 hover:text-purple-300 bg-purple-950/50 hover:bg-purple-900/60 rounded border border-purple-800/60 transition inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span class="text-[10px] font-bold">Ver</span>
+                                    </button>
+                                ` : '<span class="text-slate-600 text-[10px]">No</span>'}
                             </td>
 
                             <td class="px-4 py-3 text-right">
                                 <div class="flex items-center justify-end gap-1">
-                                    <button onclick="window.editDrop('${drop.id}')" title="Editar Drop"
-                                        class="p-1.5 text-slate-400 hover:text-amber-300 hover:bg-slate-800 rounded transition">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                            </path>
+                                    <button onclick="window.editDrop('${drop.id}')" title="Editar Drop" class="p-1 text-slate-400 hover:text-sky-300 hover:bg-slate-800 rounded transition">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
                                     </button>
                                     ${role === 'admin' ? `
-                                        <button onclick="window.deleteDrop('${drop.id}')" title="Eliminar Drop"
-                                            class="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded transition">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                </path>
+                                        <button onclick="window.deleteDrop('${drop.id}')" title="Eliminar Drop" class="p-1 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded transition">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                             </svg>
                                         </button>
                                     ` : ''}
@@ -1595,127 +1800,128 @@
             }
         };
 
-        // Render immediately on load
-        window.render();
+        // Initial Local storage recovery fallback
+        try {
+            const savedState = localStorage.getItem('boe_app_state_v2');
+            if (savedState) {
+                const parsed = JSON.parse(savedState);
+                window.appState = { ...window.appState, ...parsed };
+            }
+        } catch(e){}
+
+        window.onload = function() {
+            window.render();
+        };
     </script>
 
-    <!-- Firebase Async Sync Module -->
+    <!-- FIREBASE REALTIME CLOUD SYNC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import {
-            getAuth,
-            signInAnonymously,
-            signInWithCustomToken,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import {
-            getFirestore,
-            doc,
-            setDoc,
-            onSnapshot
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'boe-split-wow-default';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyB_GtvoiHmBnjoy-EiDSjn4PkSt9_1hf6s",
-            authDomain: "splits-6188d.firebaseapp.com",
-            projectId: "splits-6188d",
-            storageBucket: "splits-6188d.firebasestorage.app",
-            messagingSenderId: "926796958349",
-            appId: "1:926796958349:web:d67fb26e626895f0d630c4",
-            measurementId: "G-BVLQBG358C"
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'boe-split-app-default';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo-api-key",
+            authDomain: "demo-app.firebaseapp.com",
+            projectId: "demo-app",
+            storageBucket: "demo-app.appspot.com",
+            messagingSenderId: "000000000000",
+            appId: "1:000000000000:web:000000000000"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let db = null;
+        let auth = null;
 
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'boe_split_store', 'main_doc');
-
-        window.saveDataToCloud = async function () {
-            if (!auth.currentUser) return;
+        async function initSync() {
+            const syncStatusEl = document.getElementById('syncStatus');
             try {
-                await setDoc(docRef, {
-                    players: window.appState.players,
-                    drops: window.appState.drops,
-                    goldRate: window.appState.goldRate,
-                    adminPin: window.appState.adminPin,
-                    rosterPin: window.appState.rosterPin,
-                    updatedAt: new Date().toISOString()
-                }, { merge: true });
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
 
-                const syncEl = document.getElementById('syncStatus');
-                if (syncEl) {
-                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>🟢 Nube Conectada</span>`;
-                }
-            } catch (err) {
-                console.error("Error guardando datos:", err);
-                const syncEl = document.getElementById('syncStatus');
-                if (syncEl) {
-                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>🔴 Error al Guardar</span>`;
-                }
-            }
-        };
-
-        function subscribeToFirestore() {
-            onSnapshot(docRef, (snapshot) => {
-                const syncEl = document.getElementById('syncStatus');
-                if (syncEl) {
-                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>🟢 Nube Conectada</span>`;
-                }
-
-                if (snapshot.exists()) {
-                    const data = snapshot.data();
-                    if (data) {
-                        window.appState.players = Array.isArray(data.players) ? data.players : [];
-                        window.appState.drops = Array.isArray(data.drops) ? data.drops : [];
-                        window.appState.goldRate = typeof data.goldRate === 'number' ? data.goldRate : 3.7;
-                        if (data.adminPin) window.appState.adminPin = data.adminPin;
-                        if (data.rosterPin) window.appState.rosterPin = data.rosterPin;
-
-                        const rateEl = document.getElementById('goldRateInput');
-                        if (rateEl && document.activeElement !== rateEl) {
-                            rateEl.value = window.appState.goldRate;
-                        }
-
-                        window.render();
-                    }
-                } else {
-                    window.saveDataToCloud();
-                }
-            }, (error) => {
-                console.error("Firestore sync error:", error);
-                const syncEl = document.getElementById('syncStatus');
-                if (syncEl) {
-                    syncEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                    syncEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>🔴 Sin Conexión</span>`;
-                }
-            });
-        }
-
-        async function initAuth() {
-            try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
+
+                if (syncStatusEl) {
+                    syncStatusEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                    syncStatusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Sincronizado en Nube</span>`;
+                }
+
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'boeData', 'mainDoc');
+
+                onSnapshot(docRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+                        window.appState = {
+                            ...window.appState,
+                            players: data.players || [],
+                            drops: data.drops || [],
+                            debts: data.debts || {},
+                            goldRate: data.goldRate !== undefined ? data.goldRate : 3.7,
+                            adminPin: data.adminPin || "masterboe2026",
+                            rosterPin: data.rosterPin || "elites2026"
+                        };
+                        window.render();
+                    }
+                }, (error) => {
+                    console.warn("Firestore Listener Warning:", error);
+                });
+
+                window.saveDataToCloud = async function() {
+                    try {
+                        // Backup local storage
+                        localStorage.setItem('boe_app_state_v2', JSON.stringify({
+                            players: window.appState.players,
+                            drops: window.appState.drops,
+                            debts: window.appState.debts,
+                            goldRate: window.appState.goldRate,
+                            adminPin: window.appState.adminPin,
+                            rosterPin: window.appState.rosterPin
+                        }));
+
+                        if (db && auth.currentUser) {
+                            await setDoc(docRef, {
+                                players: window.appState.players,
+                                drops: window.appState.drops,
+                                debts: window.appState.debts || {},
+                                goldRate: window.appState.goldRate,
+                                adminPin: window.appState.adminPin,
+                                rosterPin: window.appState.rosterPin,
+                                lastUpdated: new Date().toISOString()
+                            });
+                        }
+                    } catch(err) {
+                        console.error("Error saving data:", err);
+                    }
+                };
+
             } catch (err) {
-                try { await signInAnonymously(auth); } catch (e) {}
+                console.warn("Firebase Init fallback to Local Storage mode:", err);
+                if (syncStatusEl) {
+                    syncStatusEl.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20";
+                    syncStatusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-500"></span><span>Modo Local</span>`;
+                }
+
+                window.saveDataToCloud = function() {
+                    try {
+                        localStorage.setItem('boe_app_state_v2', JSON.stringify({
+                            players: window.appState.players,
+                            drops: window.appState.drops,
+                            debts: window.appState.debts,
+                            goldRate: window.appState.goldRate,
+                            adminPin: window.appState.adminPin,
+                            rosterPin: window.appState.rosterPin
+                        }));
+                    } catch(e){}
+                };
             }
         }
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                subscribeToFirestore();
-            }
-        });
-
-        initAuth();
+        initSync();
     </script>
 </body>
 
