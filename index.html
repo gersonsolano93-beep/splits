@@ -63,6 +63,16 @@
         .text-glow-epic {
             text-shadow: 0 0 10px rgba(163, 53, 238, 0.4);
         }
+
+        /* Pulse highlight for active player search */
+        .player-highlighted {
+            animation: highlightPulse 2s infinite alternate;
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.6); }
+            100% { box-shadow: 0 0 12px 2px rgba(234, 179, 8, 0.9); }
+        }
     </style>
 </head>
 
@@ -87,7 +97,7 @@
                             class="text-xs px-2 py-0.5 rounded-full bg-purple-900/50 text-purple-300 border border-purple-500/30">WoW
                             Pro</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Sincronizado en tiempo real con soporte para Captures</p>
+                    <p class="text-xs text-slate-400">Sincronizado en tiempo real con soporte para Captures y Looter ID</p>
                 </div>
             </div>
 
@@ -350,8 +360,20 @@
                             </div>
                         </div>
 
-                        <!-- Stats & Socket -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- NEW FIELD: Looter / A quién le cayó + Stats Row -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <!-- Drop Winner / Looter -->
+                            <div class="sm:col-span-1">
+                                <label class="block text-xs font-bold text-amber-400 mb-1 flex items-center gap-1">
+                                    <span>⭐ ¿A quién le cayó? (Looter)</span>
+                                </label>
+                                <select id="boeLooter"
+                                    class="w-full bg-slate-900 border border-amber-500/40 focus:border-amber-400 rounded-lg px-3 py-2 text-sm font-semibold text-amber-300 focus:outline-none transition">
+                                    <option value="">-- Sin especificar --</option>
+                                </select>
+                            </div>
+
+                            <!-- Tertiary Stat -->
                             <div>
                                 <label class="block text-xs font-semibold text-slate-400 mb-1">Propiedad
                                     Terciaria</label>
@@ -364,6 +386,8 @@
                                     <option value="Indestructible">Indestructible</option>
                                 </select>
                             </div>
+
+                            <!-- Socket -->
                             <div>
                                 <label class="block text-xs font-semibold text-slate-400 mb-1">Ranura de Gema
                                     (Socket)</label>
@@ -450,15 +474,25 @@
                                 </svg>
                                 Historial de Drops / Ventas
                             </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Haz clic en cualquier venta para ver su <strong>Capture</strong> e información detallada.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Haz clic en cualquier participante o usa el filtro para <strong>resaltar a un jugador</strong>.</p>
                         </div>
 
-                        <!-- Search and Filter Bar -->
-                        <div class="w-full sm:w-auto flex items-center gap-2">
+                        <!-- Search and Interactive Player Highlight Controls -->
+                        <div class="w-full sm:w-auto flex flex-wrap items-center gap-2">
+                            <!-- Player Highlighter Dropdown -->
+                            <div class="flex items-center gap-1.5 bg-slate-900 border border-amber-500/30 px-2.5 py-1 rounded-lg">
+                                <span class="text-[11px] font-bold text-amber-400">✨ Resaltar:</span>
+                                <select id="highlightPlayerSelect" onchange="window.setHighlightedPlayer(this.value)"
+                                    class="bg-transparent text-xs font-semibold text-amber-300 focus:outline-none cursor-pointer">
+                                    <option value="" class="bg-slate-900 text-slate-300">-- Ninguno --</option>
+                                </select>
+                            </div>
+
+                            <!-- Search Input -->
                             <div class="relative flex-grow sm:flex-grow-0">
                                 <input type="text" id="searchInput" oninput="window.render()"
                                     placeholder="Buscar ítem o jugador..."
-                                    class="w-full sm:w-48 bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
+                                    class="w-full sm:w-44 bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
                                 <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -477,7 +511,7 @@
                                     <th class="px-4 py-3">Ítem / Pieza</th>
                                     <th class="px-4 py-3">Atributos</th>
                                     <th class="px-4 py-3">Valor / Precio</th>
-                                    <th class="px-4 py-3">Participantes</th>
+                                    <th class="px-4 py-3">Participantes / ⭐ Looter</th>
                                     <th class="px-4 py-3 text-center">Capture</th>
                                     <th class="px-4 py-3 text-right">Acciones</th>
                                 </tr>
@@ -678,6 +712,20 @@
                     </div>
                 </div>
 
+                <!-- NEW: Obtenido por / Looter Highlight Box -->
+                <div class="bg-gradient-to-r from-amber-950/40 via-purple-950/30 to-slate-900/60 p-3 rounded-xl border border-amber-500/30 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">⭐</span>
+                        <div>
+                            <span class="block text-[10px] font-bold uppercase text-amber-400 tracking-wider">Obtenido Por / Cayó a:</span>
+                            <span id="modalLooterName" class="text-sm font-extrabold text-amber-300">No especificado</span>
+                        </div>
+                    </div>
+                    <span id="modalLooterBadgeTag" class="text-[11px] px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                        Drop Recibido
+                    </span>
+                </div>
+
                 <!-- Participants List Tag -->
                 <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-800/80">
                     <span class="block text-xs font-bold text-slate-400 mb-1.5">Participantes (<span id="modalParticipantsCount">0</span>):</span>
@@ -740,7 +788,8 @@
             drops: [],
             goldRate: 3.7,
             adminPin: "masterboe2026",
-            rosterPin: "elites2026"
+            rosterPin: "elites2026",
+            highlightedPlayer: "" // Interactive player highlighter
         };
 
         window.userSession = (function() {
@@ -774,6 +823,21 @@
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
+        };
+
+        /* --- HIGHLIGHT PLAYER FUNCTIONALITY --- */
+        window.setHighlightedPlayer = function(playerName) {
+            window.appState.highlightedPlayer = playerName || "";
+            
+            const selectEl = document.getElementById('highlightPlayerSelect');
+            if (selectEl && selectEl.value !== window.appState.highlightedPlayer) {
+                selectEl.value = window.appState.highlightedPlayer;
+            }
+
+            if (playerName) {
+                window.showToast(`Resaltando a '${playerName}' en todas las tablas`, "info");
+            }
+            window.render();
         };
 
         /* --- AUTH & MODAL FUNCTIONS --- */
@@ -840,6 +904,10 @@
                 }
                 if (password === correctRosterPass || password === correctAdminPass) {
                     window.userSession = { role: 'roster', username: username };
+                    // Auto-highlight logged in user if they are in roster
+                    if (window.appState.players.includes(username)) {
+                        window.appState.highlightedPlayer = username;
+                    }
                     saveSessionAndNotify();
                 } else {
                     showLoginError("Contraseña de Roster incorrecta (Usa: elites2026)");
@@ -977,10 +1045,30 @@
             if (drop.socket && drop.socket !== 'Sin Ranura') attrs.push(drop.socket);
             document.getElementById('modalAttributes').innerText = attrs.length > 0 ? attrs.join(' · ') : 'Sin Terciaria / Socket';
 
+            // Display LOOTER info in modal
+            const looterName = drop.looter || 'No especificado';
+            document.getElementById('modalLooterName').innerText = looterName;
+
             document.getElementById('modalParticipantsCount').innerText = participants.length;
             const pListEl = document.getElementById('modalParticipantsList');
             pListEl.innerHTML = participants.length > 0
-                ? participants.map(p => `<span class="px-2 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-purple-800 text-[11px] font-semibold">${p}</span>`).join('')
+                ? participants.map(p => {
+                    const isLooter = drop.looter && drop.looter === p;
+                    const isHighlighted = window.appState.highlightedPlayer && window.appState.highlightedPlayer === p;
+
+                    let badgeClass = "px-2 py-0.5 rounded text-[11px] font-semibold cursor-pointer transition ";
+                    if (isLooter) {
+                        badgeClass += "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black border border-amber-300 shadow-md";
+                    } else if (isHighlighted) {
+                        badgeClass += "bg-yellow-400 text-slate-950 font-black border border-amber-300 ring-2 ring-yellow-300";
+                    } else {
+                        badgeClass += "bg-purple-950/80 text-purple-300 border border-purple-800 hover:border-purple-500";
+                    }
+
+                    return `<span onclick="window.setHighlightedPlayer('${p}')" class="${badgeClass}" title="${isLooter ? '⭐ ¿A quién le cayó este BoE?' : 'Haz clic para resaltar a este jugador'}">
+                        ${isLooter ? '⭐ ' : ''}${p}
+                    </span>`;
+                }).join('')
                 : '<span class="text-xs text-slate-500">Sin participantes asignados.</span>';
 
             const imgEl = document.getElementById('modalCaptureImg');
@@ -1071,6 +1159,7 @@
 
             const name = document.getElementById('boeName').value.trim();
             const priceGold = parseFloat(document.getElementById('boePriceGold').value) || 0;
+            const looter = document.getElementById('boeLooter').value.trim(); // LOOTER FIELD
             const stat = document.getElementById('boeStat').value;
             const socket = document.getElementById('boeSocket').value;
             const captureUrl = document.getElementById('boeCaptureDataUrl').value || null;
@@ -1080,6 +1169,11 @@
             document.querySelectorAll('.player-checkbox:checked').forEach(cb => {
                 selectedPlayers.push(cb.value);
             });
+
+            // Ensure looter is included in participants if selected
+            if (looter && !selectedPlayers.includes(looter)) {
+                selectedPlayers.push(looter);
+            }
 
             if (!name) {
                 window.showToast("Ingresa un nombre válido para el ítem.", "error");
@@ -1093,6 +1187,7 @@
                         ...window.appState.drops[index],
                         name,
                         priceGold,
+                        looter,
                         stat,
                         socket,
                         participants: selectedPlayers,
@@ -1106,6 +1201,7 @@
                     id: 'drop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
                     name,
                     priceGold,
+                    looter,
                     stat,
                     socket,
                     participants: selectedPlayers,
@@ -1133,6 +1229,7 @@
             document.getElementById('editingId').value = drop.id;
             document.getElementById('boeName').value = drop.name;
             document.getElementById('boePriceGold').value = drop.priceGold || '';
+            document.getElementById('boeLooter').value = drop.looter || '';
             document.getElementById('boeStat').value = drop.stat || '';
             document.getElementById('boeSocket').value = drop.socket || 'Sin Ranura';
             
@@ -1165,6 +1262,7 @@
             document.getElementById('editingId').value = '';
             document.getElementById('boeName').value = '';
             document.getElementById('boePriceGold').value = '';
+            document.getElementById('boeLooter').value = '';
             document.getElementById('boeStat').value = '';
             document.getElementById('boeSocket').value = 'Sin Ranura';
             window.removeCapture();
@@ -1238,7 +1336,7 @@
 
         /* --- MAIN RENDER ENGINE --- */
         window.render = function() {
-            const { players, drops, goldRate } = window.appState;
+            const { players, drops, goldRate, highlightedPlayer } = window.appState;
             const role = window.userSession ? window.userSession.role : 'guest';
 
             // 1. Update Auth / Role Header UI
@@ -1278,24 +1376,42 @@
             document.getElementById('statAverageGold').innerText = `${Math.round(avgGoldPerPlayer).toLocaleString()} g`;
             document.getElementById('playerBadgeCount').innerText = players.length;
 
+            // Update Looter Form Select Options
+            const boeLooterSelect = document.getElementById('boeLooter');
+            if (boeLooterSelect) {
+                const currentVal = boeLooterSelect.value;
+                boeLooterSelect.innerHTML = `<option value="">-- Sin especificar --</option>` +
+                    players.map(p => `<option value="${p}">${p}</option>`).join('');
+                boeLooterSelect.value = currentVal;
+            }
+
+            // Update Highlight Select Options
+            const highlightSelect = document.getElementById('highlightPlayerSelect');
+            if (highlightSelect) {
+                highlightSelect.innerHTML = `<option value="" class="bg-slate-900 text-slate-300">-- Ninguno --</option>` +
+                    players.map(p => `<option value="${p}" class="bg-slate-900 text-amber-300" ${p === highlightedPlayer ? 'selected' : ''}>${p}</option>`).join('');
+            }
+
             // 3. Render Roster Player List
             const playerListUI = document.getElementById('playerListUI');
             if (players.length === 0) {
                 playerListUI.innerHTML = `<li class="text-xs text-slate-500 text-center py-4">No hay jugadores registrados.</li>`;
             } else {
-                playerListUI.innerHTML = players.map((p, idx) => `
-                    <li class="flex items-center justify-between bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 transition text-xs">
-                        <span class="font-semibold text-slate-200 flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                playerListUI.innerHTML = players.map((p, idx) => {
+                    const isHighlighted = highlightedPlayer === p;
+                    return `
+                    <li onclick="window.setHighlightedPlayer('${isHighlighted ? '' : p}')" class="cursor-pointer flex items-center justify-between ${isHighlighted ? 'bg-amber-950/80 border-amber-400 ring-1 ring-amber-400' : 'bg-slate-900/70 hover:bg-slate-900 border-slate-800'} border rounded-lg px-3 py-1.5 transition text-xs">
+                        <span class="font-semibold ${isHighlighted ? 'text-amber-300 font-bold' : 'text-slate-200'} flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full ${isHighlighted ? 'bg-amber-400 animate-pulse' : 'bg-sky-400'}"></span>
                             ${p}
                         </span>
                         ${role === 'admin' ? `
-                            <button onclick="window.removePlayer(${idx})" title="Eliminar jugador" class="text-slate-500 hover:text-rose-400 p-1 transition">
+                            <button onclick="event.stopPropagation(); window.removePlayer(${idx})" title="Eliminar jugador" class="text-slate-500 hover:text-rose-400 p-1 transition">
                                 &times;
                             </button>
                         ` : ''}
                     </li>
-                `).join('');
+                `}).join('');
             }
 
             // 4. Render Participant Checkboxes
@@ -1326,11 +1442,12 @@
                 totalsContainerUI.innerHTML = players.map(p => {
                     const gold = Math.round(playerTotals[p]?.gold || 0);
                     const usd = ((gold / 100000) * goldRate).toFixed(2);
+                    const isHighlighted = highlightedPlayer === p;
                     return `
-                        <div class="flex items-center justify-between p-2.5 bg-slate-900/60 rounded-lg border border-slate-800 hover:border-purple-900/50 transition">
+                        <div onclick="window.setHighlightedPlayer('${isHighlighted ? '' : p}')" class="cursor-pointer flex items-center justify-between p-2.5 ${isHighlighted ? 'bg-amber-950/70 border-amber-500 ring-1 ring-amber-400' : 'bg-slate-900/60 border-slate-800 hover:border-purple-900/50'} rounded-lg border transition">
                             <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                                <span class="font-bold text-slate-200 text-xs">${p}</span>
+                                <span class="w-2 h-2 rounded-full ${isHighlighted ? 'bg-amber-300 animate-ping' : 'bg-amber-400'}"></span>
+                                <span class="font-bold ${isHighlighted ? 'text-amber-300 text-xs' : 'text-slate-200 text-xs'}">${p}</span>
                             </div>
                             <div class="text-right">
                                 <span class="block font-black text-amber-300 text-xs">${gold.toLocaleString()} g</span>
@@ -1350,7 +1467,8 @@
                 if (!searchInput) return true;
                 const matchName = d.name.toLowerCase().includes(searchInput);
                 const matchParticipant = Array.isArray(d.participants) && d.participants.some(p => p.toLowerCase().includes(searchInput));
-                return matchName || matchParticipant;
+                const matchLooter = d.looter && d.looter.toLowerCase().includes(searchInput);
+                return matchName || matchParticipant || matchLooter;
             });
 
             if (filteredDrops.length === 0) {
@@ -1371,8 +1489,10 @@
                     if (drop.stat) attrs.push(`<span class="px-1.5 py-0.5 rounded bg-sky-950 text-sky-300 border border-sky-800 text-[10px]">${drop.stat}</span>`);
                     if (drop.socket && drop.socket !== 'Sin Ranura') attrs.push(`<span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px]">+Socket</span>`);
 
+                    const isDropLooterHighlighted = highlightedPlayer && drop.looter === highlightedPlayer;
+
                     return `
-                        <tr class="hover:bg-slate-900/60 transition group">
+                        <tr class="hover:bg-slate-900/60 transition group ${isDropLooterHighlighted ? 'bg-amber-950/20' : ''}">
                             <td class="px-4 py-3 cursor-pointer" onclick="window.openCaptureModal('${drop.id}')">
                                 <div class="font-bold text-purple-300 group-hover:text-amber-300 transition flex items-center gap-2">
                                     <span>${drop.name}</span>
@@ -1398,10 +1518,39 @@
                                     : `<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20">Pendiente</span>`}
                             </td>
 
-                            <td class="px-4 py-3 cursor-pointer" onclick="window.openCaptureModal('${drop.id}')">
-                                <div class="flex flex-wrap gap-1 max-w-xs">
+                            <!-- PARTICIPANTS & LOOTER HIGHLIGHT COLUMN -->
+                            <td class="px-4 py-3">
+                                <div class="flex flex-wrap gap-1 max-w-sm">
                                     ${participants.length > 0 
-                                        ? participants.map(p => `<span class="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded text-[10px]">${p}</span>`).join('')
+                                        ? participants.map(p => {
+                                            const isLooter = drop.looter && drop.looter === p;
+                                            const isHighlighted = highlightedPlayer && highlightedPlayer === p;
+
+                                            if (isLooter) {
+                                                // LOOTER HIGHLIGHT BADGE (⭐)
+                                                return `<span onclick="window.setHighlightedPlayer('${isHighlighted ? '' : p}')" 
+                                                    title="⭐ Le cayó a ${p} (Looter). Haz clic para resaltar." 
+                                                    class="cursor-pointer inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-bold text-[10px] bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 border border-amber-300 shadow-sm transition hover:scale-105 ${isHighlighted ? 'ring-2 ring-yellow-300' : ''}">
+                                                    <span>⭐</span>
+                                                    <span>${p}</span>
+                                                </span>`;
+                                            } else if (isHighlighted) {
+                                                // USER SELECTED HIGHLIGHT BADGE
+                                                return `<span onclick="window.setHighlightedPlayer('')" 
+                                                    title="Jugador resaltado. Haz clic para quitar resaltado." 
+                                                    class="cursor-pointer inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-extrabold text-[10px] bg-yellow-400 text-slate-950 border border-amber-300 ring-2 ring-yellow-300 transition">
+                                                    <span>👉</span>
+                                                    <span>${p}</span>
+                                                </span>`;
+                                            } else {
+                                                // NORMAL PARTICIPANT BADGE
+                                                return `<span onclick="window.setHighlightedPlayer('${p}')" 
+                                                    title="Haz clic para resaltar a ${p}" 
+                                                    class="cursor-pointer px-1.5 py-0.5 bg-slate-800 hover:bg-purple-900/60 text-slate-300 hover:text-purple-200 rounded text-[10px] transition">
+                                                    ${p}
+                                                </span>`;
+                                            }
+                                        }).join('')
                                         : '<span class="text-slate-600 text-[10px]">Sin asignación</span>'}
                                 </div>
                             </td>
